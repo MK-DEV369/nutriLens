@@ -16,8 +16,7 @@ import tensorflow as tf
 ocr = PaddleOCR(lang='en')
 
 # Define the image path
-image_dir = "FoodLabels"
-image_path = f"{image_dir}/Image_AlooBhuji_160.png"
+image_path = "Image_AlooBhuji_160.png"
 
 
 # %%

@@ -3,6 +3,7 @@ import { Github, Linkedin, Twitter } from 'lucide-react';
 import ajay from "./images/ajay.jpg";
 import morya from "./images/morya.jpg";
 import srikanth from "./images/srikanth.jpg";
+import nihal from "./images/nihal.jpg";
 
 interface TeamMember {
   name: string;
@@ -38,13 +39,13 @@ const teamMembers: TeamMember[] = [
     }
   },
   {
-    name: "Nihal",
+    name: "Nihal Soni",
     role: "Nutrition Specialist",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&h=300&fit=crop",
+    image: nihal,
     bio: "Registered dietitian with a passion for making nutrition information accessible and easy to understand.",
     social: {
-      linkedin: "#",
-      twitter: "#"
+      linkedin: "http://www.linkedin.com/in/nihalsoni2004",
+      github: "https://github.com/nihalsoni2004"
     }
   },
   {

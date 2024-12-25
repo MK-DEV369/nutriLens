@@ -62,7 +62,7 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100">
       <Navbar />
       {path === '/analyze' ? <AnalyzePage /> : <HomePage />}
-      {showModal && <Modal onSave={handleSaveData} />} {/* Show modal */}
+      {showModal && <Modal onSave={handleSaveData} />}
     </div>
   );
 }
