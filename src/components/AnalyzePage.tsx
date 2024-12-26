@@ -38,8 +38,9 @@ export function AnalyzePage() {
     alert('Image cropped and saved successfully!');
   };
 
-  const handleCaptureImage = (blob: Blob) => {
-    const file = new File([blob], 'captured-image.png', { type: 'image/png' });
+  const handleCaptureImage = async (blob: Blob) => {
+    const blobArray = await blob.arrayBuffer();
+    const file = new File([new Uint8Array(blobArray)], 'captured-image.png', { type: 'image/png' });
     setSelectedFile(file);
     setShowCropModal(true);
     setShowCameraModal(false);

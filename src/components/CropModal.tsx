@@ -66,10 +66,23 @@ const CropModal: React.FC<CropModalProps> = ({ imageFile, onClose, onSave }) => 
       0, 0, width, height
     );
   
-    canvas.toBlob((blob) => {
+    canvas.toBlob(async (blob) => {
       if (blob) {
-        const file = new File([blob], 'image.png', { type: 'image/png' });
-        onSave(file);
+        const formData = new FormData();
+        formData.append('image', blob, 'cropped-image.png');
+  
+        const response = await fetch('http://localhost:5000/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+  
+        if (response.ok) {
+          const data = await response.json();
+          alert('Image uploaded successfully: ' + data.filePath);
+          onSave(new File([blob], 'cropped-image.png', { type: 'image/png' }));
+        } else {
+          alert('Failed to upload image');
+        }
       }
     }, 'image/png');
   };
