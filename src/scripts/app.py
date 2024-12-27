@@ -7,7 +7,8 @@ app = Flask(__name__)
 CORS(app) 
 
 
-UPLOAD_FOLDER = '../components/scan'
+UPLOAD_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'components', 'scan', 'table-image.png'))
+
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
@@ -15,7 +16,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 def get_res():
     return jsonify({"msg":"Server is healthy"})
 
-@app.route('/', methods=['POST'])
+@app.route('/api/:userId/upload', methods=['POST'])
 def handle_request():
     weight = request.form.get('weight')
     choice = request.form.get('choice')
@@ -24,12 +25,15 @@ def handle_request():
     if not weight or not choice or not image:
         return jsonify({"error": "Missing required fields"}), 400
 
-    image_path = os.path.join(UPLOAD_FOLDER, 'captured_img.png')
+    image_path = os.path.join(UPLOAD_FOLDER, 'table-image.png')
     image.save(image_path) 
     
-    result = main(1,60)
-    print(result)
-    return jsonify(result)
+    try:
+        result = main(1, float(weight))
+        print(result)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

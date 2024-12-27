@@ -37,9 +37,9 @@ function App() {
       try {
         const numericData = {
           ...formData,
-          age: Number(formData.age), // Convert to number
-          weight: Number(formData.weight), // Convert to number
-          height: Number(formData.height), // Convert to number
+          age: Number(formData.age),
+          weight: Number(formData.weight),
+          height: Number(formData.height),
         };
         const response = await axios.post(`http://localhost:5000/api/user-data`, {
           clerkId: user.id,

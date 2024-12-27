@@ -10,13 +10,51 @@ export function AnalyzePage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showCropModal, setShowCropModal] = useState(false);
   const [showCameraModal, setShowCameraModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<NutrientInfo | null>(null);
   
-
+  interface NutrientInfo {
+    [key: string]: number | string;
+  }
+  
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setSelectedFile(file);
       setShowCropModal(true);
+    }
+  };
+
+  const handleProcess = async () => {
+    if (!selectedFile || !servingSize || !foodName) {
+      alert("Please fill out all fields and upload an image.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('weight', servingSize);
+    formData.append('choice', foodName);
+    formData.append('image', selectedFile);
+
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:5000/api/:userId/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to process the request.');
+      }
+
+      const data = await response.json();
+      setAnalysisResult(data);
+      console.log('Response:', data);
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An error occurred while processing the request.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -121,39 +159,63 @@ export function AnalyzePage() {
               />
             </div>
           </div>
-            <button className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-all shadow-lg">
-            Process
-          </button>
+          <button
+              onClick={handleProcess}
+              disabled={loading}
+              className={`mt-4 w-full ${loading ? 'bg-emerald-400' : 'bg-green-600 hover:bg-green-700'} text-white py-2 px-4 rounded-lg transition-all shadow-lg`}
+            >
+              {loading ? 'Processing...' : 'Process'}
+            </button>
           </div>
           <div className="bg-white rounded-xl shadow-lg p-6">
-  <h2 className="text-xl font-semibold mb-4">Analysis Results</h2>
-  <div className="space-y-6">
-    <div className="bg-gray-50 p-4 rounded-lg">
-      <h3 className="text-lg font-medium mb-2">Safety Rating</h3>
-      <div className="h-4 bg-emerald-200 rounded-full">
-        <div className="h-4 bg-emerald-600 rounded-full w-0"></div>
-      </div>
-      <p className="text-emerald-700 mt-2">{selectedFile ? 'Processing...' : 'Upload to check Rating'}</p>
-    </div>
+            <h2 className="text-xl font-semibold mb-4">Analysis Results</h2>
+            <div className="space-y-6">
+            {loading ? (
+              <div className="flex justify-center items-center h-full">
+                <div className="loader border-t-4 border-b-4 border-emerald-600 rounded-full w-12 h-12 animate-spin"></div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {analysisResult ? (
+                  <>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h3 className="text-lg font-medium mb-2">Final Rating</h3>
+                      <p className="text-emerald-700">{analysisResult[0]}</p>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h3 className="text-lg font-medium mb-2">Nutritional Info</h3>
+                      <ul className="list-disc list-inside text-gray-700">
+                        {Object.entries(analysisResult[1]).map(([key, value]) => (
+                          <li key={key}>
+                            {key.replace(/_/g, ' ')}: {typeof value === 'number' ? <span>{value.toFixed(2)}</span> : value}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-gray-500">Upload an image to see the results.</p>
+                )}
+              </div>
+            )}
 
-    <div className="bg-gray-50 p-4 rounded-lg">
-      <h3 className="text-lg font-medium mb-2">Recommended Amount</h3>
-      <p className="text-gray-700">{selectedFile ? 'Processing...' : 'Upload to check Recommended Amount'}</p>
-      <p className="text-sm text-gray-500 mt-1">{selectedFile ? '' : ''}</p>
-    </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium mb-2">Recommended Amount</h3>
+                <p className="text-gray-700">{selectedFile ? 'Processing...' : 'Upload to check Recommended Amount'}</p>
+                <p className="text-sm text-gray-500 mt-1">{selectedFile ? '' : ''}</p>
+              </div>
 
-    <div className="bg-gray-50 p-4 rounded-lg">
-      <h3 className="text-lg font-medium mb-2 flex items-center gap-2">
-        <AlertTriangle className="w-5 h-5 text-amber-500" />
-        Allergen Information
-      </h3>
-      <ul className="list-disc list-inside text-gray-700">
-        {selectedFile ? <li>Processing...</li> : <li>Upload to check Allergen Info</li>}
-      </ul>
-    </div>
-  </div>
-</div>
-
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="text-lg font-medium mb-2 flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5 text-amber-500" />
+                  Allergen Information
+                </h3>
+                <ul className="list-disc list-inside text-gray-700">
+                  {selectedFile ? <li>Processing...</li> : <li>Upload to check Allergen Info</li>}
+                        </ul>
+              </div>
+            </div>
+          </div>
         </div>
         
 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

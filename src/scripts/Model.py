@@ -262,7 +262,7 @@ def get_user_profile(user_id):
         print(f"Error fetching user profile: {e}")
         raise
 
-def choice(special_needs, age, gender):
+def userChoice(special_needs, age, gender):
     """Map special needs, age, and gender to a choice value."""
     mapping = {
         "Obesity": 7,
@@ -301,7 +301,7 @@ def findDict(user_id):
     gender = user_profile.get("gender", "")
 
     # Map to a choice value
-    choice = map_special_needs_to_choice(special_needs, age, gender)
+    choice = userChoice(special_needs, age, gender)
 
     # Map choice to the corresponding dictionary
     nutrient_dict = {

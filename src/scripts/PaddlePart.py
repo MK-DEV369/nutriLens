@@ -14,20 +14,29 @@ from pathlib import Path
 import re
 from rapidfuzz import process, fuzz
 import pandas as pd
+import os
 
 # %%
 # Initialize PaddleOCR
 ocr = PaddleOCR(lang='en')
 
 # Define the image path
-BASE_DIR = Path(__file__).resolve().parent
-image_path = BASE_DIR / "scan" / "target-image.png"
+image_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'components', 'scan', 'table-image.png'))
 
 
 # %%
 def preprocess_image(image_path):
+    print(f"Attempting to open image at path: {image_path}")
+    # Check if the file exists
+    if not os.path.isfile(image_path):
+        raise FileNotFoundError(f"The file {image_path} does not exist.")
+        
     # Load image
     image = cv2.imread(str(image_path))
+    
+    # Check if the image was loaded successfully
+    if image is None:
+        raise ValueError(f"Unable to open image file: {image_path}")
     
     # Convert to grayscale
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
