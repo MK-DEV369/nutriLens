@@ -24,3 +24,13 @@ dist-ssr
 *.sw?
 *.env
 *.env.local
+*cleaned_image.jpg
+*cleaned_nutrition_data.jpg
+*detected_tables.jpg
+*Final_Table.csv
+*highlighted_image_dark.jpg
+*horiz_vert.jpg
+*im_nms.jpg
+*cleaned_nutrition_data.csv
+*__pycache__
+*table-image.jpg
