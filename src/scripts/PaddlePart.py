@@ -1,5 +1,5 @@
 # %%
-# Install PaddleOCR and necessary libraries
+# Install PaddleOCR and necessary libraries from requirements.txt
 # !pip install paddleocr protobuf==3.20.2
 
 
@@ -10,19 +10,24 @@ from paddleocr import PaddleOCR
 import numpy as np
 import csv
 import tensorflow as tf
+from pathlib import Path
+import re
+from rapidfuzz import process, fuzz
+import pandas as pd
 
 # %%
 # Initialize PaddleOCR
 ocr = PaddleOCR(lang='en')
 
 # Define the image path
-image_path = "Image_AlooBhuji_160.png"
+BASE_DIR = Path(__file__).resolve().parent
+image_path = BASE_DIR / "scan" / "target-image.png"
 
 
 # %%
 def preprocess_image(image_path):
     # Load image
-    image = cv2.imread(image_path)
+    image = cv2.imread(str(image_path))
     
     # Convert to grayscale
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -269,17 +274,7 @@ out_array=np.array(out_array)
 out_array
 
 # %%
-
-
-# %%
-import pandas as pd
-
-# %%
 pd.DataFrame(out_array).to_csv('Final_Table.csv')
-
-# %%
-import re
-from rapidfuzz import process, fuzz
 
 # Updated list of known nutrients
 KNOWN_NUTRIENTS = [

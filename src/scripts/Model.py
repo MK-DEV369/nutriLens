@@ -1,4 +1,6 @@
 import csv
+import os
+from pymongo import MongoClient
 
 men_dict = {
     "PROTEINS": 54,
@@ -45,8 +47,8 @@ women_dict = {
     "VITAMIN_C": 65,
     "VITAMIN_A": 840,
     "SUGAR": 50,
-   "TOTAL_FAT": 67,
-   "SATURATED_FAT": 22, 
+    "TOTAL_FAT": 67,
+    "SATURATED_FAT": 22, 
     "SODIUM": 2000,    
     "VITAMIN_D": 600,
     "CHOLESTEROL":300,
@@ -237,36 +239,85 @@ hypertension_dict = {
     "CARBOHYDRATES": 130, # Controlled intake of complex carbs, avoiding high-glycemic index foods
     "SATURATED_FAT": 15,  # Reduced to help manage cholesterol and blood pressure
     "SODIUM": 1500 ,       # Reduced sodium intake to help manage hypertension
-     "CHOLESTEROL":200,
+    "CHOLESTEROL":200,
 }
 
-def findDict():
-    
-    choice=int(input(
-        "Enter 1 for male\nEnter 2 for female\nEnter 3 for pregnant\nEnter 4 for 10-12\nEnter 5 for 13-15\nEnter 6 for 16-18\nEnter 7 for obesity\nEnter 8 for diabetes\nEnter 9 for hypertension"
-        ))
-    
-    
-    if choice==1:
-        d_dict=men_dict
-    elif choice==2:
-        d_dict=women_dict
-    elif choice==3:
-        d_dict=pregnant_women_dict
-    elif choice==4:
-        d_dict=children_10_12_years_dict
-    elif choice==5:
-        d_dict=children_13_15_years_dict
-    elif choice==6:
-        d_dict=children_16_18_years_dict
-    elif choice==7:
-        d_dict=obesity_dict
-    elif choice==8:
-        d_dict=diabetes_dict
-    elif choice==9:
-        d_dict=hypertension_dict
-    
-    return d_dict
+# MongoDB Connection
+def get_user_profile(user_id):
+    """Fetch user profile from MongoDB by user ID."""
+    try:
+        # Establish connection to the database
+        client = MongoClient("mongodb+srv://lmoryakanthaai24:1014Moryakantha@macropix.raaxs.mongodb.net/")
+        db = client['nutrilens']  # Database name
+        collection = db['userprofiles']  # Collection name
+
+        # Fetch user profile
+        user_profile = collection.find_one({"clerkId": user_id})
+
+        if not user_profile:
+            raise ValueError(f"No user profile found for user ID: {user_id}")
+
+        return user_profile
+    except Exception as e:
+        print(f"Error fetching user profile: {e}")
+        raise
+
+def choice(special_needs, age, gender):
+    """Map special needs, age, and gender to a choice value."""
+    mapping = {
+        "Obesity": 7,
+        "Diabetes": 8,
+        "High BP": 9,
+        "Pregnancy": 3,
+        "Hypertension": 9,
+    }
+
+    # Prioritize special needs
+    for need in special_needs:
+        if need in mapping:
+            return mapping[need]
+
+    # Fallback to general profiles based on gender/age
+    if gender.lower() == "male":
+        return 1
+    elif gender.lower() == "female":
+        return 2
+    elif age <= 12:
+        return 4
+    elif 13 <= age <= 15:
+        return 5
+    elif 16 <= age <= 18:
+        return 6
+
+    raise ValueError("Unable to determine a choice based on user profile")
+
+def findDict(user_id):
+    """Determine the nutrient dictionary based on user profile."""
+    user_profile = get_user_profile(user_id)
+
+    # Extract details
+    special_needs = user_profile.get("specialNeeds", [])
+    age = user_profile.get("age", 0)
+    gender = user_profile.get("gender", "")
+
+    # Map to a choice value
+    choice = map_special_needs_to_choice(special_needs, age, gender)
+
+    # Map choice to the corresponding dictionary
+    nutrient_dict = {
+        1: men_dict,
+        2: women_dict,
+        3: pregnant_women_dict,
+        4: children_10_12_years_dict,
+        5: children_13_15_years_dict,
+        6: children_16_18_years_dict,
+        7: obesity_dict,
+        8: diabetes_dict,
+        9: hypertension_dict,
+    }.get(choice)
+    if nutrient_dict is None:
+        raise ValueError("Invalid choice for nutrient dictionary")
+    return nutrient_dict
 
 # Function to read a CSV file into a dictionary
 def csv_to_dict(csv_file):
@@ -328,8 +379,6 @@ dict_benef = {
     "CARBOHYDRATES": [25, 12, 3]   # Carbohydrates for energy
 }
 
-
-
 # Refined critical values for scoring liability nutrients
 dict_liab = {
     "SUGAR": [15, 25, 4],
@@ -384,7 +433,6 @@ def score_liability(bad_dict):
             print("8liab")
             num += 8 * arr[2]  # Reduced penalty
         else:
-           
             x=value/arr[0]
             x=10-1.5*x
             x = max(-1, 10 - (value / arr[0]) * 1.5)  # Less severe penalty scamling
@@ -394,8 +442,7 @@ def score_liability(bad_dict):
 
     return num, den,countliab10,countrda
 
-import csv
-import os
+
 
 # File to write the CSV data
 csv_file = "DATASET.csv"
@@ -450,57 +497,71 @@ nutrients_dict = {
 }
 
 # Main execution
-if __name__ == "__main__":
-
-    user_dict=findDict()
+def execute_model(user_id, weight_of_food):
+    try:
+        # Fetch user profile from MongoDB
+        user_profile = get_user_profile(user_id)
+        
+        # Extract details from user profile
+        special_needs = user_profile.get("specialNeeds", [])
+        age = user_profile.get("age", 0)
+        gender = user_profile.get("gender", "")
+        
+        # Map to a choice value
+        choice = choice(special_needs, age, gender)
+        
+        # Determine the nutrient dictionary based on user profile
+        user_dict = findDict(user_id)
+        
+        # Read nutrition data from CSV file
+        data_dict = csv_to_dict("cleaned_nutrition_data.csv")
+        
+        # Convert data to RDA percentages
+        data_dict = convert_dict_to_rda(user_dict, data_dict, weight_of_food)
+        
+        # Separate beneficial and liability nutrients
+        good_dict, bad_dict = separate_dict(data_dict)
+        
+        # Score beneficial nutrients
+        num_good, den_good, countbenef10, count_rda_good = score_beneficial(good_dict)
+        
+        # Score liability nutrients
+        num_bad, den_bad, countliab10, count_rda_bad = score_liability(bad_dict)
+        
+        # Calculate final rating
+        final_rating = round((num_good + num_bad) / (den_good + den_bad), 4)
+        
+        # Adjust final rating based on nutrient balance
+        goodx = len(good_dict)
+        badx = len(bad_dict)
+        
+        update = 0
+        if goodx == badx and goodx >= 4:
+            badx += 1
+        if goodx > badx:
+            update = round((((count_rda_good * goodx) - (count_rda_bad * badx)) / ((goodx * 100) - (badx * 100))), 4)
+        elif goodx < badx:
+            update = round((((count_rda_bad * badx) - (count_rda_good * goodx)) / ((goodx * 100) - (badx * 100))), 4)
+            if update < -3:
+                update = -3
+        
+        # Apply update to final rating
+        final_rating += update
+        
+        # Ensure final rating is within a reasonable range
+        final_rating = max(0, min(final_rating, 10))
+        
+        # Add final rating to data dictionary
+        data_dict["FINAL_RATING"] = final_rating
+        
+        # Append data to CSV file
+        append_dict_to_csv(csv_file, data_dict, nutrients_dict)
+        
+        return final_rating, data_dict
     
-    weight_of_food = int(input("Enter the weight of food that your are consuming in grams"))  # User-specified weight in grams
-    data_dict = csv_to_dict("cleaned_nutrition_data.csv")  # Example CSV file
-    data_dict = convert_dict_to_rda(user_dict,data_dict, weight_of_food)
-    print(data_dict)
-
-    good_dict, bad_dict = separate_dict(data_dict)
-    goodx=len(good_dict)
-    badx=len(bad_dict)
-
-    num_good, den_good,countbenef10,count_rda_good = score_beneficial(good_dict)
-    num_bad, den_bad ,countliab10,count_rda_bad= score_liability(bad_dict)
-
-
-    final_rating = round((num_good + num_bad) / (den_good + den_bad), 4)
-    
-    print(str(count_rda_good)+"   "+str(count_rda_bad))
-    
-    print(str(goodx)+"goodnum"+str(badx))
-    update=0
-    if(goodx==badx and goodx>=4):
-      badx+=1
-    if goodx>badx:
-        update=round((((count_rda_good*goodx)-(count_rda_bad*badx))/((goodx*100)-(badx*100))),4)
-    elif goodx<badx:
-        update=round((((count_rda_bad*badx)-(count_rda_good*goodx))/((goodx*100)-(badx*100))),4)
-        if update < -3:
-            update=-3
-
-    elif final_rating<8.5:
-        final_rating+=count_rda_good/count_rda_bad
-    
-    print(update)
-    final_rating+=update
-    print("Final Rating:", final_rating)
-
-
-    data_dict["FINAL_RATING"]=final_rating
-    print(data_dict)
-
-    # Append the dictionaries to the CSV file
-    append_dict_to_csv(csv_file, data_dict, nutrients_dict)
-
-
-
-
-
-
+    except Exception as e:
+        print(f"Error in execute_model: {e}")
+        return None, None
 
 
 

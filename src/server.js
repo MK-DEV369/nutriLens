@@ -16,7 +16,7 @@ app.use(cors());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const scanDir = path.join(__dirname, '..', 'components', 'scan');
+const scanDir = path.join(__dirname, 'components', 'scan');
 try {
   await fs.access(scanDir);
   console.log('Scan directory exists:', true);
@@ -28,7 +28,6 @@ try {
     throw err;
   }
 }
-const targetFileName = 'table-image.png';
 
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB connected successfully'))

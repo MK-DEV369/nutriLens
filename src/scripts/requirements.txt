@@ -1,0 +1,10 @@
+paddleocr
+protobuf==3.20.2
+opencv-python
+tensorflow
+numpy
+pandas
+rapidfuzz
+flask
+
+#pip install -r src/python_scripts/requirements.txt
