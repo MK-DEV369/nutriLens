@@ -1,26 +1,21 @@
-import React from 'react';
-import { Menu } from 'lucide-react';
+import React, { useState } from 'react';
+import { Menu, X } from 'lucide-react';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 import { Chatbot } from './Chatbot';
 
-
 export function Navbar() {
-  const scrollToAbout = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const aboutSection = document.getElementById('about');
-    if (window.location.pathname !== '/') {
-      window.location.href = '/#about';
-    } else {
-      aboutSection?.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   const handleNavigation = (e: React.MouseEvent, path: string) => {
     e.preventDefault();
     window.location.href = path;
   };
 
   const isCurrentPath = (path: string) => window.location.pathname === path;
+
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen((prev) => !prev);
+  };
 
   return (
     <nav className="bg-white shadow-sm">
@@ -51,11 +46,11 @@ export function Navbar() {
               Analyze
             </NavLink>
             <NavLink 
-              href="#about" 
-              onClick={scrollToAbout}
-              isActive={false}
+              href="/history" 
+              onClick={(e) => handleNavigation(e, '/history')}
+              isActive={isCurrentPath('/history')}
             >
-              About Us
+              History
             </NavLink>
           </div>
           <div className="flex sticky space-x-4">
@@ -66,16 +61,36 @@ export function Navbar() {
               <UserButton />
             </SignedIn>
             <Chatbot />
-            
 
-            <div className="md:hidden">
-              <button className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100">
-                <Menu className="h-6 w-6" />
-              </button>
-            </div>
+            <button
+              className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              onClick={toggleMobileMenu}
+            >
+              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
           </div>
         </div>
       </div>
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 bg-gray-100 z-50 p-4">
+          <div className="flex flex-col items-center space-y-6">
+            <NavLink href="/" onClick={(e) => handleNavigation(e, '/')} isActive={isCurrentPath('/')}>
+              Home
+            </NavLink>
+            <NavLink href="/analyze" onClick={(e) => handleNavigation(e, '/analyze')} isActive={isCurrentPath('/')}>
+              Analyze
+            </NavLink>
+            <NavLink href="/history" onClick={(e) => handleNavigation(e, '/history')} isActive={isCurrentPath('/')}>
+              History
+            </NavLink>
+          </div>
+          <div className="mt-auto flex justify-center">
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+          </div>
+        </div>
+      )} :
     </nav>
   );
 }

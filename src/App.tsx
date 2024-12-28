@@ -5,6 +5,7 @@ import { Navbar } from './components/Navbar';
 import { HomePage } from './components/HomePage';
 import { AnalyzePage } from './components/AnalyzePage';
 import Modal from './components/Modal';
+import HistoryPage from './components/HistoryPage';
 
 function App() {
   const { user } = useUser();
@@ -62,6 +63,7 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100">
       <Navbar />
       {path === '/analyze' ? <AnalyzePage /> : <HomePage />}
+      {path === '/history' ? <HistoryPage /> : <HomePage />}
       {showModal && <Modal onSave={handleSaveData} />}
     </div>
   );

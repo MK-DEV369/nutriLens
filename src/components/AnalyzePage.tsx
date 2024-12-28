@@ -38,7 +38,7 @@ export function AnalyzePage() {
 
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/api/:userId/upload', {
+      const response = await fetch('http://localhost:5000/api/upload', {
         method: 'POST',
         body: formData,
       });
@@ -169,8 +169,9 @@ export function AnalyzePage() {
           </div>
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h2 className="text-xl font-semibold mb-4">Analysis Results</h2>
-            <div className="space-y-6">
-            {loading ? (
+            <div className="space-y-6">            
+              <div className="bg-gray-50 p-4 rounded-lg">
+              {loading ? (
               <div className="flex justify-center items-center h-full">
                 <div className="loader border-t-4 border-b-4 border-emerald-600 rounded-full w-12 h-12 animate-spin"></div>
               </div>
@@ -198,9 +199,10 @@ export function AnalyzePage() {
                 )}
               </div>
             )}
+              </div>
 
               <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-medium mb-2">Recommended Amount</h3>
+                <h3 className="text-lg font-medium mb-2">Recommended Amount and Scan Description</h3>
                 <p className="text-gray-700">{selectedFile ? 'Processing...' : 'Upload to check Recommended Amount'}</p>
                 <p className="text-sm text-gray-500 mt-1">{selectedFile ? '' : ''}</p>
               </div>
@@ -208,7 +210,7 @@ export function AnalyzePage() {
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h3 className="text-lg font-medium mb-2 flex items-center gap-2">
                   <AlertTriangle className="w-5 h-5 text-amber-500" />
-                  Allergen Information
+                  Other Food Suggested
                 </h3>
                 <ul className="list-disc list-inside text-gray-700">
                   {selectedFile ? <li>Processing...</li> : <li>Upload to check Allergen Info</li>}

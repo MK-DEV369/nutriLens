@@ -151,6 +151,17 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/api/history', async (req, res) => {
+  try {
+    const userId = req.query.userId; // Optional: filter by user ID if needed
+    const history = await History.find({ userId }); // Adjust schema and query as per your DB
+    res.status(200).json(history);
+  } catch (error) {
+    console.error("Error fetching history data:", error);
+    res.status(500).json({ error: "Failed to fetch history data" });
+  }
+});
+
 app.get('/api/user-profiles', async (req, res) => {
   try {
     const profiles = await UserProfile.find();

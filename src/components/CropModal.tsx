@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
+import ReactCrop, { Crop, PixelCrop} from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
 interface CropModalProps {
@@ -8,13 +8,18 @@ interface CropModalProps {
   onSave: (croppedImage: File) => void;
 }
 
+interface CustomCrop extends Omit<Crop, 'aspect'> {
+  aspect?: number;
+}
+
 const CropModal: React.FC<CropModalProps> = ({ imageFile, onClose, onSave }) => {
-  const [crop, setCrop] = useState<Crop>({
-    unit: `%`,
-    width: 50,
-    height: 50,
-    x: 10,
-    y: 10,
+  const [crop, setCrop] = useState<CustomCrop>({
+    unit: "%",
+    width: 100,
+    height: 100,
+    aspect: 1,
+    x: 0,
+    y: 0,
   });
   
   const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null);
@@ -30,12 +35,14 @@ const CropModal: React.FC<CropModalProps> = ({ imageFile, onClose, onSave }) => 
 
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const { width, height } = e.currentTarget;
+    const aspectRatio = Math.min(width, height) / Math.max(width, height);
     setCrop({
-      unit: `%`,
-      width: 50,
-      height: (50 * (height || 100)) / (width || 100), 
-      x: 10,
-      y: 10,
+      unit: "%",
+      width: 100,
+      height: 100,
+      aspect: aspectRatio,
+      x: 0,
+      y: 0,
     });
   };
   
@@ -55,38 +62,51 @@ const CropModal: React.FC<CropModalProps> = ({ imageFile, onClose, onSave }) => 
       return;
     }
   
-    const { width, height, x, y } = completedCrop;
-  
-    canvas.width = width;
-    canvas.height = height;
+    //const aspectRatio = completedCrop.width / completedCrop.height;
+    canvas.width = Math.floor(completedCrop.width);
+    canvas.height = Math.floor(completedCrop.height);
   
     ctx.drawImage(
       image,
-      x, y, width, height,
-      0, 0, width, height
+      completedCrop.x, completedCrop.y, completedCrop.width, completedCrop.height,
+      0, 0, completedCrop.width, completedCrop.height
     );
   
     canvas.toBlob(async (blob) => {
       if (blob) {
         const formData = new FormData();
-        formData.append('image', blob, 'cropped-image.png');
+        formData.append('image', blob, 'table-image.png');
   
-        const response = await fetch('http://localhost:5000/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
+        try {
+          const response = await fetch('http://localhost:5000/api/upload', {
+            method: 'POST',
+            body: formData,
+          });
   
-        if (response.ok) {
-          const data = await response.json();
-          alert('Image uploaded successfully: ' + data.filePath);
-          onSave(new File([blob], 'cropped-image.png', { type: 'image/png' }));
-        } else {
+          if (response.ok) {
+            onSave(new File([blob], 'table-image.png', { type: 'image/png' }));
+          } else {
+            alert('Failed to upload image');
+          }
+        } catch (error) {
+          console.error('Upload error:', error);
           alert('Failed to upload image');
         }
       }
     }, 'image/png');
   };
   
+  const onCropComplete = (c: Crop | undefined) => {
+    if (c) {
+      console.log("Completed crop:", c);
+      setCompletedCrop({
+        ...c,
+        unit: "px",
+        width: Math.max(100, c.width),
+        height: Math.max(100, c.height),
+      });
+    }
+  };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
@@ -101,9 +121,7 @@ const CropModal: React.FC<CropModalProps> = ({ imageFile, onClose, onSave }) => 
             <ReactCrop
               crop={crop}
               onChange={(newCrop) => setCrop(newCrop)}
-              onComplete={(c) => {
-                console.log("Completed crop:", c);
-                setCompletedCrop(c)} }
+              onComplete={onCropComplete}
               className="max-w-full"
             >
               <img
