@@ -1,6 +1,7 @@
 import csv
 import os
 from pymongo import MongoClient
+from dotenv import load_dotenv
 
 men_dict = {
     "PROTEINS": 54,
@@ -242,10 +243,15 @@ hypertension_dict = {
     "CHOLESTEROL":200,
 }
 
+load_dotenv()
+
 def get_user_profile(user_id):
     """Fetch user profile from MongoDB by user ID."""
     try:
-        client = MongoClient("mongodb+srv://lmoryakanthaai24:1014Moryakantha@macropix.raaxs.mongodb.net/")
+        MONGO_URI = os.getenv('MONGO_URI')
+        if not MONGO_URI:
+            raise ValueError("MongoDB URI not found in environment variables")
+        client = MongoClient(MONGO_URI)
         db = client['nutrilens']
         collection = db['userprofiles']
         user_profile = collection.find_one({"clerkId": user_id})

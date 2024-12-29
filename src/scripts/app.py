@@ -5,12 +5,15 @@ from pymongo import MongoClient
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from main import main
+from dotenv import load_dotenv
 # from ChatbotPrompt import generate_description_and_suggestions
 
 app = Flask(__name__)
 CORS(app)
 
-client = MongoClient('mongodb+srv://lmoryakanthaai24:1014Moryakantha@macropix.raaxs.mongodb.net/')
+load_dotenv()
+MONGO_URI = os.getenv('MONGO_URI')
+client = MongoClient(MONGO_URI)
 db = client['nutrilens']
 history_collection = db['history']
 user_profiles_collection = db['userprofiles']

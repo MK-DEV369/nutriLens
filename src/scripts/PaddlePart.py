@@ -204,10 +204,10 @@ im_nms = image_cv.copy()
 # %%
 for val in horiz_lines:
     cv2.rectangle(im_nms, 
-                  (int(horiz_boxes[val][0]), int(horiz_boxes[val][1])), 
-                  (int(horiz_boxes[val][2]), int(horiz_boxes[val][3])), 
-                  (0, 0, 255),  # Color in BGR (Red in this case)
-                  thickness=3)   # Increase the thickness to 3 (or higher for thicker lines)
+    (int(horiz_boxes[val][0]), int(horiz_boxes[val][1])), 
+    (int(horiz_boxes[val][2]), int(horiz_boxes[val][3])), 
+    (0, 0, 255),  # Color in BGR (Red in this case)
+    thickness=3)   # Increase the thickness to 3 (or higher for thicker lines)
 
 # %%
 vert_out = tf.image.non_max_suppression(
@@ -251,38 +251,29 @@ def intersection(box_1, box_2):
 
 # %%
 def iou(box_1, box_2):
-
-  x_1 = max(box_1[0], box_2[0])
-  y_1 = max(box_1[1], box_2[1])
-  x_2 = min(box_1[2], box_2[2])
-  y_2 = min(box_1[3], box_2[3])
-
-  inter = abs(max((x_2 - x_1, 0)) * max((y_2 - y_1), 0))
-  if inter == 0:
-      return 0
-
-  box_1_area = abs((box_1[2] - box_1[0]) * (box_1[3] - box_1[1]))
-  box_2_area = abs((box_2[2] - box_2[0]) * (box_2[3] - box_2[1]))
-
-  return inter / float(box_1_area + box_2_area - inter)
-
+    x_1 = max(box_1[0], box_2[0])
+    y_1 = max(box_1[1], box_2[1])
+    x_2 = min(box_1[2], box_2[2])
+    y_2 = min(box_1[3], box_2[3])
+    inter = abs(max((x_2 - x_1, 0)) * max((y_2 - y_1), 0))
+    if inter == 0:
+        return 0
+    box_1_area = abs((box_1[2] - box_1[0]) * (box_1[3] - box_1[1]))
+    box_2_area = abs((box_2[2] - box_2[0]) * (box_2[3] - box_2[1]))
+    return inter / float(box_1_area + box_2_area - inter)  
 # %%
 for i in range(len(horiz_lines)):
-  for j in range(len(vert_lines)):
-    resultant = intersection(horiz_boxes[horiz_lines[i]], vert_boxes[vert_lines[ordered_boxes[j]]] )
+    for j in range(len(vert_lines)):
+        resultant = intersection(horiz_boxes[horiz_lines[i]], vert_boxes[vert_lines[ordered_boxes[j]]] )
 
     for b in range(len(boxes)):
-      the_box = [boxes[b][0][0],boxes[b][0][1],boxes[b][2][0],boxes[b][2][1]]
-      if(iou(resultant,the_box)>0.1):
-        out_array[i][j] = texts[b]
+        the_box = [boxes[b][0][0],boxes[b][0][1],boxes[b][2][0],boxes[b][2][1]]
+        if(iou(resultant,the_box)>0.1):
+            out_array[i][j] = texts[b]
 
 # %%
 out_array=np.array(out_array)
-
-# %%
 out_array
-
-# %%
 pd.DataFrame(out_array).to_csv('Final_Table.csv')
 
 # Updated list of known nutrients
