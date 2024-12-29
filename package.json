@@ -4,12 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node server.js",
+    "dev": "\"vite --host\" concurrently \"npm start\" \"npm run dev-backend\" ",
+    "dev-backend": "nodemon --watch scripts --exec python scripts/app.py"
   },
-  "dependencies": {
+    "dependencies": {
     "@clerk/clerk-react": "^5.20.2",
     "@clerk/nextjs": "^6.9.2",
     "@mediapipe/camera_utils": "^0.3.1675466862",

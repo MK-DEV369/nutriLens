@@ -57,7 +57,7 @@ women_dict = {
 
 pregnant_women_dict = {
     "PROTEINS": 60,
-    "FIBER": 35,  # Not listed
+    "FIBER": 35,
     "CALCIUM": 1000,
     "MAGNESIUM": 440,
     "IRON": 27,
@@ -66,11 +66,11 @@ pregnant_women_dict = {
     "THIAMINE": 2.0,
     "RIBOFLAVIN": 2.7,
     "ENERGY": 2000,
-    "NIACIN": 16,  # Increment by 2
+    "NIACIN": 16,
     "VITAMIN_B6": 2.3,
     "FOLATE": 570,
-    "VITAMIN_B12": 2.4,  # Increment by 0.25
-    "VITAMIN_C": 80,  # Increment by 15
+    "VITAMIN_B12": 2.4,
+    "VITAMIN_C": 80,
     "VITAMIN_A": 900,
     "VITAMIN_D":600,
     "SUGAR": 50,
@@ -103,7 +103,7 @@ children_10_12_years_dict = {
     "SUGAR": 50,
     "TOTAL_FAT": 67,
     "SATURATED_FAT": 22,
-     "CHOLESTEROL":300,
+    "CHOLESTEROL":300,
     "CARBOHYDRATES": 130,
 
 }
@@ -130,7 +130,7 @@ children_13_15_years_dict = {
     "SUGAR": 50,
     "TOTAL_FAT": 67,
     "SATURATED_FAT": 22,
-     "CHOLESTEROL":300,
+    "CHOLESTEROL":300,
     "CARBOHYDRATES": 130,
 
 }
@@ -148,7 +148,7 @@ children_16_18_years_dict = {
     "NIACIN": 22,
     "VITAMIN_B6": 3.0,
     "FOLATE": 340,
-     "ENERGY": 2000,
+    "ENERGY": 2000,
     "VITAMIN_B12": 2.2,
     "VITAMIN_C": 85,
     "VITAMIN_A": 1000,
@@ -157,101 +157,97 @@ children_16_18_years_dict = {
     "SUGAR": 50,
     "TOTAL_FAT": 67,
     "SATURATED_FAT": 22,
-     "CHOLESTEROL":300,
+    "CHOLESTEROL":300,
     "CARBOHYDRATES": 130,
 
 }
 
 diabetes_dict = {
 
-    "PROTEINS": 60,      # Slightly increased for better glycemic control and muscle health
-    "FIBER": 50,         # Higher intake to aid blood sugar regulation
-    "CALCIUM": 1000,     # No change; essential for bone health
-    "MAGNESIUM": 500,    # Increased; helps improve insulin sensitivity
+    "PROTEINS": 60,
+    "FIBER": 50,
+    "CALCIUM": 1000,
+    "MAGNESIUM": 500,
     "ENERGY": 2000,    
-    "IRON": 19,          # No change; standard requirement
-    "ZINC": 17,          # No change; supports immune function
-    "IODINE": 140,       # No change; essential for thyroid health
-    "THIAMINE": 2.0,     # Slightly increased; helps glucose metabolism
-    "RIBOFLAVIN": 2.5,   # No change
-    "NIACIN": 18,        # No change
-    "VITAMIN_B6": 2.5,   # Slightly increased; supports nerve health
-    "FOLATE": 400,       # Increased; aids cardiovascular health
-    "VITAMIN_B12": 2.5,  # Slightly increased for nerve function
-    "VITAMIN_C": 90,     # Slightly increased; combats oxidative stress
-    "VITAMIN_A": 900,    # Slightly reduced; as excessive Vitamin A may harm glycemic control
-    "VITAMIN_D": 800,    # Increased; supports insulin sensitivity
-    "SUGAR": 25,         # Added sugar limit (grams/day); focus on natural sugars from whole foods
-    "TOTAL_FAT": 70,           # Total fat (grams/day); focus on healthy fats like unsaturated fats
-    "CARBOHYDRATES": 130, # Minimum daily intake (grams/day); focus on low glycemic index carbs
+    "IRON": 19,
+    "ZINC": 17,
+    "IODINE": 140,
+    "THIAMINE": 2.0,
+    "RIBOFLAVIN": 2.5,
+    "NIACIN": 18,
+    "VITAMIN_B6": 2.5,
+    "FOLATE": 400,
+    "VITAMIN_B12": 2.5,
+    "VITAMIN_C": 90,
+    "VITAMIN_A": 900,
+    "VITAMIN_D": 800,
+    "SUGAR": 25,
+    "TOTAL_FAT": 70,
+    "CARBOHYDRATES": 130,
     "SATURATED_FAT": 22,
-    "SODIUM": 1500 ,      # Reduced limit (milligrams/day) to manage blood pressure and heart health
-   "CHOLESTEROL":200,
+    "SODIUM": 1500 ,
+    "CHOLESTEROL":200,
 }
 
 obesity_dict = {
-    "PROTEINS": 70,       # Increased to support muscle mass preservation during weight loss
-    "FIBER": 40,          # Increased for better satiety and digestive health
-    "CALCIUM": 1000,      # No change; essential for bone health
-    "MAGNESIUM": 400,     # Increased to support metabolic processes
-    "ENERGY": 1800,       # Reduced total energy intake to support weight loss
-    "IRON": 18,           # No change; standard requirement
-    "ZINC": 15,           # No change; supports immune function
-    "IODINE": 150,        # No change; essential for thyroid health
-    "THIAMINE": 1.5,      # Slightly reduced as overall intake is lowered
-    "RIBOFLAVIN": 1.5,    # No change
-    "NIACIN": 16,         # No change
-    "VITAMIN_B6": 2.0,    # Slightly increased for energy metabolism
-    "FOLATE": 400,        # Increased for cardiovascular health and weight management
-    "VITAMIN_B12": 2.4,   # No change
-    "VITAMIN_C": 90,      # Slightly increased to help with immune function and antioxidant protection
-    "VITAMIN_A": 800,     # Reduced to avoid excess intake
-    "VITAMIN_D": 800,     # Increased to support metabolic health
-    "SUGAR": 20,          # Limited sugar intake, focusing on whole foods and natural sugars
-    "TOTAL_FAT": 60,      # Reduced fat intake, with emphasis on healthy fats
-    "CARBOHYDRATES": 130, # Controlled intake of low-glycemic index carbs
-    "SATURATED_FAT": 15,  # Reduced to improve lipid profiles
-    "SODIUM": 2000  ,      # Moderate sodium intake to support heart health
+    "PROTEINS": 70,
+    "FIBER": 40,
+    "CALCIUM": 1000,
+    "MAGNESIUM": 400,
+    "ENERGY": 1800,
+    "IRON": 18,
+    "ZINC": 15,
+    "IODINE": 150,
+    "THIAMINE": 1.5,
+    "RIBOFLAVIN": 1.5,
+    "NIACIN": 16,
+    "VITAMIN_B6": 2.0,
+    "FOLATE": 400,
+    "VITAMIN_B12": 2.4,
+    "VITAMIN_C": 90,
+    "VITAMIN_A": 800,
+    "VITAMIN_D": 800,
+    "SUGAR": 20,
+    "TOTAL_FAT": 60, 
+    "CARBOHYDRATES": 130,
+    "SATURATED_FAT": 15,
+    "SODIUM": 2000,
     "CHOLESTEROL":200,
 
 }
 
 hypertension_dict = {
-    "PROTEINS": 70,       # No change; standard intake for muscle maintenance
-    "FIBER": 35,          # Increased for better digestive health and heart function
-    "CALCIUM": 1200,      # Increased for blood pressure regulation
-    "MAGNESIUM": 450,     # Increased to support heart health and blood pressure management
-    "ENERGY": 1800,       # Moderate calorie intake for weight management and blood pressure control
-    "IRON": 18,           # No change; standard requirement
-    "ZINC": 15,           # No change; supports immune function
-    "IODINE": 150,        # No change; essential for thyroid health
-    "THIAMINE": 1.5,      # No change; essential for carbohydrate metabolism
-    "RIBOFLAVIN": 1.5,    # No change
-    "NIACIN": 16,         # No change
-    "VITAMIN_B6": 2.5,    # Slightly increased to support nerve health
-    "FOLATE": 400,        # Increased for cardiovascular and heart health
-    "VITAMIN_B12": 2.4,   # No change
-    "VITAMIN_C": 90,      # Increased for antioxidant protection
-    "VITAMIN_A": 800,     # Moderate intake to avoid excess, while supporting health
-    "VITAMIN_D": 800,     # Increased for heart and bone health
-    "SUGAR": 15,          # Limited sugar intake to avoid weight gain and blood sugar spikes
-    "TOTAL_FAT": 60,      # Focus on unsaturated fats, reduced total fat intake
-    "CARBOHYDRATES": 130, # Controlled intake of complex carbs, avoiding high-glycemic index foods
-    "SATURATED_FAT": 15,  # Reduced to help manage cholesterol and blood pressure
-    "SODIUM": 1500 ,       # Reduced sodium intake to help manage hypertension
+    "PROTEINS": 70,
+    "FIBER": 35,
+    "CALCIUM": 1200,
+    "MAGNESIUM": 450,
+    "ENERGY": 1800,
+    "IRON": 18,
+    "ZINC": 15,
+    "IODINE": 150,
+    "THIAMINE": 1.5,
+    "RIBOFLAVIN": 1.5,
+    "NIACIN": 16,
+    "VITAMIN_B6": 2.5,
+    "FOLATE": 400,
+    "VITAMIN_B12": 2.4,
+    "VITAMIN_C": 90,
+    "VITAMIN_A": 800,
+    "VITAMIN_D": 800,
+    "SUGAR": 15,
+    "TOTAL_FAT": 60,
+    "CARBOHYDRATES": 130,
+    "SATURATED_FAT": 15,
+    "SODIUM": 1500 ,
     "CHOLESTEROL":200,
 }
 
-# MongoDB Connection
 def get_user_profile(user_id):
     """Fetch user profile from MongoDB by user ID."""
     try:
-        # Establish connection to the database
         client = MongoClient("mongodb+srv://lmoryakanthaai24:1014Moryakantha@macropix.raaxs.mongodb.net/")
-        db = client['nutrilens']  # Database name
-        collection = db['userprofiles']  # Collection name
-
-        # Fetch user profile
+        db = client['nutrilens']
+        collection = db['userprofiles']
         user_profile = collection.find_one({"clerkId": user_id})
 
         if not user_profile:
@@ -271,13 +267,9 @@ def userChoice(special_needs, age, gender):
         "Pregnancy": 3,
         "Hypertension": 9,
     }
-
-    # Prioritize special needs
     for need in special_needs:
         if need in mapping:
             return mapping[need]
-
-    # Fallback to general profiles based on gender/age
     if gender.lower() == "male":
         return 1
     elif gender.lower() == "female":
@@ -294,16 +286,10 @@ def userChoice(special_needs, age, gender):
 def findDict(user_id):
     """Determine the nutrient dictionary based on user profile."""
     user_profile = get_user_profile(user_id)
-
-    # Extract details
     special_needs = user_profile.get("specialNeeds", [])
     age = user_profile.get("age", 0)
     gender = user_profile.get("gender", "")
-
-    # Map to a choice value
     choice = userChoice(special_needs, age, gender)
-
-    # Map choice to the corresponding dictionary
     nutrient_dict = {
         1: men_dict,
         2: women_dict,
@@ -319,29 +305,32 @@ def findDict(user_id):
         raise ValueError("Invalid choice for nutrient dictionary")
     return nutrient_dict
 
-# Function to read a CSV file into a dictionary
 def csv_to_dict(csv_file):
-    data_dict = {}
-    with open(csv_file, mode='r', newline='') as file:
-        csv_reader = csv.reader(file)
-        for row in csv_reader:
-            key, value = row
-            if key.strip() in men_dict:
-                data_dict[key.strip()] = float(value.strip())
-    return data_dict
+    try:
+        data_dict = {}
+        with open(csv_file, mode='r', newline='') as file:
+            csv_reader = csv.reader(file)
+            for row in csv_reader:
+                key, value = row
+                if key.strip() in men_dict:
+                    data_dict[key.strip()] = float(value.strip())
+        return data_dict
+    except Exception as e:
+        print(f"Error reading CSV file: {str(e)}")
+        return {}
 
-#### how much do u want to consume????
-# Convert per 100g values to RDA percentages
+# Convert per 100g values to RDA percentages based on Consumption
 def convert_to_rda(per100g_value, rda_value, weight_of_food):
     return round(((per100g_value * weight_of_food) / (100 * rda_value)) * 100, 4)
 
 
 ###### gender , age , diabetes , bp , weight , pregnancy
-def convert_dict_to_rda(d_dict,data_dict, weight_of_food):
-    print("hi")
-    print(dict)
-    print("ny")
-    return {key: convert_to_rda(value, d_dict[key], weight_of_food) for key, value in data_dict.items()}
+def convert_dict_to_rda(d_dict, data_dict, weight_of_food):
+    try:
+        return {key: convert_to_rda(value, d_dict[key], weight_of_food) for key, value in data_dict.items()}
+    except Exception as e:
+        print(f"Error converting to RDA: {str(e)}")
+        return {}
 
 # Beneficial nutrients (good impact)
 benef = [
@@ -397,78 +386,58 @@ def separate_dict(data_dict):
 # Scoring algorithm for beneficial nutrients
 def score_beneficial(good_dict):
     num, den = 0, 0
-    countbenef10=0
-    countrda=0
+    countbenef10 = 0
+    countrda = 0
     for key, value in good_dict.items():
         arr = dict_benef[key]
-        countrda+=value
+        countrda += value
         if value >= arr[0]:
-            print("10benef")
-            countbenef10+=1
+            countbenef10 += 1
             num += 10 * arr[2]
         elif arr[1] <= value < arr[0]:
-            print("8bene")
             num += 8 * arr[2]
         else:
-            print("2bene")
             x = max(2, 10 - (arr[0] / value) * 1.5)
             num += x * arr[2]
         den += arr[2]
-    return num, den ,countbenef10,countrda
-
+    return num, den, countbenef10, countrda
 
 # Adjusted scoring algorithm for liability nutrients
 def score_liability(bad_dict):
     num, den = 0, 0
-    countliab10=0
-    countrda=0
+    countliab10 = 0
+    countrda = 0
     for key, value in bad_dict.items():
         arr = dict_liab[key]
-        countrda+=value
+        countrda += value
         if value <= arr[0]:
-            print("10liab")
-            countliab10+=1
+            countliab10 += 1
             num += 10 * arr[2]
         elif arr[0] < value <= arr[1]:
-            print("8liab")
-            num += 8 * arr[2]  # Reduced penalty
+            num += 8 * arr[2]
         else:
-            x=value/arr[0]
-            x=10-1.5*x
-            x = max(-1, 10 - (value / arr[0]) * 1.5)  # Less severe penalty scamling
-            print("xliab"+str(x))
+            x = value / arr[0]
+            x = 10 - 1.5 * x
+            x = max(-1, 10 - (value / arr[0]) * 1.5)
             num += x * arr[2]
         den += arr[2]
+    return num, den, countliab10, countrda
 
-    return num, den,countliab10,countrda
-
-
-
-# File to write the CSV data
 csv_file = "DATASET.csv"
 
-# Function to append dictionary to CSV file
 def append_dict_to_csv(file, data, all_keys):
-    file_exists = os.path.isfile(file)
+    try:
+        file_exists = os.path.isfile(file)
+        with open(file, mode='a', newline='\n', encoding='utf-8') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=all_keys)
+            if not file_exists:
+                writer.writeheader()
+            complete_data = {key: data.get(key, "") for key in all_keys}
+            writer.writerow(complete_data)
+        print(f"Data appended to {file} successfully!")
+    except Exception as e:
+        print(f"Error appending to CSV file: {str(e)}")
 
-    # Open the file in append mode
-    with open(file, mode='a', newline='\n', encoding='utf-8') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=all_keys)
-
-        # If file doesn't exist, write the header first
-        if not file_exists:
-            writer.writeheader()
-
-        # Fill missing keys with empty values
-        complete_data = {key: data.get(key, "") for key in all_keys}
-
-        # Write the row data
-        writer.writerow(complete_data)
-
-    print(f"Data appended to {file} successfully!")
-
-# List of all possible keys (columns)
-# Missing "Name" and "Age"
 nutrients_dict = {
     "PROTEINS": None,
     "FIBER": None,
@@ -498,43 +467,21 @@ nutrients_dict = {
 
 # Main execution
 def execute_model(user_id, weight_of_food):
-    try:
-        # Fetch user profile from MongoDB
-        user_profile = get_user_profile(user_id)
-        
-        # Extract details from user profile
-        special_needs = user_profile.get("specialNeeds", [])
+    try:        
+        user_profile = get_user_profile(user_id) # Fetch user profile from MongoDB
+        special_needs = user_profile.get("specialNeeds", []) # Extract details from user profile
         age = user_profile.get("age", 0)
         gender = user_profile.get("gender", "")
-        
-        # Map to a choice value
-        choice = choice(special_needs, age, gender)
-        
-        # Determine the nutrient dictionary based on user profile
-        user_dict = findDict(user_id)
-        
-        # Read nutrition data from CSV file
-        data_dict = csv_to_dict("cleaned_nutrition_data.csv")
-        
-        # Convert data to RDA percentages
-        data_dict = convert_dict_to_rda(user_dict, data_dict, weight_of_food)
-        
-        # Separate beneficial and liability nutrients
-        good_dict, bad_dict = separate_dict(data_dict)
-        
-        # Score beneficial nutrients
-        num_good, den_good, countbenef10, count_rda_good = score_beneficial(good_dict)
-        
-        # Score liability nutrients
-        num_bad, den_bad, countliab10, count_rda_bad = score_liability(bad_dict)
-        
-        # Calculate final rating
-        final_rating = round((num_good + num_bad) / (den_good + den_bad), 4)
-        
-        # Adjust final rating based on nutrient balance
-        goodx = len(good_dict)
-        badx = len(bad_dict)
-        
+        choice = choice(special_needs, age, gender) # Map to a choice value
+        user_dict = findDict(user_id) # Determine the nutrient dictionary based on user profile
+        data_dict = csv_to_dict("cleaned_nutrition_data.csv") # Read nutrition data from CSV file
+        data_dict = convert_dict_to_rda(user_dict, data_dict, weight_of_food) # Convert data to RDA percentages
+        good_dict, bad_dict = separate_dict(data_dict) # Separate beneficial and liability nutrients
+        num_good, den_good, countbenef10, count_rda_good = score_beneficial(good_dict) # Score beneficial nutrients
+        num_bad, den_bad, countliab10, count_rda_bad = score_liability(bad_dict) # Score liability nutrients
+        final_rating = round((num_good + num_bad) / (den_good + den_bad), 4) # Calculate final rating
+        goodx = len(good_dict) # Adjust final rating based on nutrient balance
+        badx = len(bad_dict)        
         update = 0
         if goodx == badx and goodx >= 4:
             badx += 1
@@ -544,99 +491,11 @@ def execute_model(user_id, weight_of_food):
             update = round((((count_rda_bad * badx) - (count_rda_good * goodx)) / ((goodx * 100) - (badx * 100))), 4)
             if update < -3:
                 update = -3
-        
-        # Apply update to final rating
-        final_rating += update
-        
-        # Ensure final rating is within a reasonable range
-        final_rating = max(0, min(final_rating, 10))
-        
-        # Add final rating to data dictionary
-        data_dict["FINAL_RATING"] = final_rating
-        
-        # Append data to CSV file
-        append_dict_to_csv(csv_file, data_dict, nutrients_dict)
-        
-        return final_rating, data_dict
-    
+        final_rating += update # Apply update to final rating
+        final_rating = max(0, min(final_rating, 10)) # Ensure final rating is within a reasonable range
+        data_dict["FINAL_RATING"] = final_rating # Add final rating to data dictionary
+        append_dict_to_csv(csv_file, data_dict, nutrients_dict) # Append data to CSV file  
+        return final_rating, data_dict    
     except Exception as e:
         print(f"Error in execute_model: {e}")
         return None, None
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# import pandas as pd
-# def update_dataframe_with_dict(csv_file_path, dict_data, output_file_path):
-#     """
-#     This function updates a CSV file's DataFrame with values from a given dictionary.
-
-#     :param csv_file_path: str, path to the input CSV file
-#     :param dict_data: dict, dictionary with key-value pairs to update the DataFrame columns
-#     :param output_file_path: str, path to save the updated CSV file
-#     """
-#     # Load the CSV file into a DataFrame
-#     df = pd.read_csv(csv_file_path)
-
-#     # Iterate over the dictionary and update the DataFrame
-#     for key, value in dict_data.items():
-#         if key in df.columns:
-#             # If the column exists, update it with the dictionary value
-#             df[key] = value
-#         else:
-#             # If the column doesn't exist, add it with the value from the dictionary
-#             df[key] = value
-
-#     # Save the updated DataFrame back to a CSV
-#     df.to_csv(output_file_path, index=False)
-
-#     # Return the updated DataFrame (optional, just for verification or further processing)
-#     return df
-
-# # Example usage
-# csv_file_path = 'BRUHCSV.csv'  # Replace with your actual CSV file path
-# output_file_path = 'updated_file.csv'
-
-# # Call the function
-# updated_df = update_dataframe_with_dict(csv_file_path, data_dict, output_file_path)
-
-# # Print the resulting DataFrame to check the changes
-# print(updated_df)
-
-
-#     ## ADDING REMAINING NUTRIENTS
-#     ## ADD REMAINING DICTS
-#     ## DECIDE ALL INPUTS REQUIRED FROM USER
-#     ## CREATING THE DATASET
-    
-
-# # ## age , gender , pregnency , amount of consumption , (are u consuming the food??) , diabetes , obesity , high bp . weight , height 
-    # elif count_rda_good>count_rda_bad:
-    #     x=10-final_rating
-    #     count=countbenef10+countliab10
-    #     x=x/count
-    #     final_rating+=x

@@ -337,19 +337,16 @@ def clean_data(file_path, output_path):
         # Get nutrient name and amount value
         nutrient_name = str(row[1]).strip().upper()  # Clean and standardize nutrient name
         amount_value = str(row[2]).strip()  # Clean amount value
-
         # Find the closest match for the nutrient name
         match, score, _ = process.extractOne(
             nutrient_name, KNOWN_NUTRIENTS, scorer=fuzz.partial_ratio
         )
-
         # Additional specificity check: Avoid confusing similar nutrient names
         if score > 70 and match not in processed_nutrients:  # Ensure no repetition
             # Extract the numeric value from the amount column
             match_amount = re.search(r"\b(\d+(?:\.\d+)?)\s*(?:[a-zA-Z]*)\b", amount_value)  # Look for numbers
             if match_amount:
                 amount = float(match_amount.group(1))  # Convert number to a float
-
                 # Skip if amount is 0
                 if amount != 0:
                     cleaned_data.append([match, amount])  # Add the valid nutrient and amount to the list
@@ -362,14 +359,12 @@ def clean_data(file_path, output_path):
             print(f"Skipped duplicate nutrient: {match}")
         else:
             print(f"Skipped row (no valid nutrient match): {nutrient_name}")
-
-    # Save the cleaned data to a new CSV file without column names
     pd.DataFrame(cleaned_data).to_csv(output_path, index=False, header=False)
     print(f"Cleaned data saved to {output_path}")
 
 # Example usage
-input_file = "Final_Table.csv"  # Input file path
-output_file = "cleaned_nutrition_data.csv"  # Output file path
+input_file = "Final_Table.csv"
+output_file = "cleaned_nutrition_data.csv"
 clean_data(input_file, output_file)
 
 

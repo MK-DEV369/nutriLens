@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
-import { Camera, Upload, AlertTriangle } from 'lucide-react';
+import { Camera, Upload} from 'lucide-react';
 import CropModal from '../components/CropModal';
 import { CameraModal } from './CameraModal';
 import { Blob } from 'buffer';
+import { useUser } from "@clerk/clerk-react";
 
 export function AnalyzePage() {
+  const { user } = useUser();
   const [foodName, setFoodName] = useState('');
   const [servingSize, setServingSize] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showCropModal, setShowCropModal] = useState(false);
   const [showCameraModal, setShowCameraModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<NutrientInfo | null>(null);
-  
-  interface NutrientInfo {
-    [key: string]: number | string;
-  }
+  const [analysisResult, setAnalysisResult] = useState<{
+    FinalRating: number;
+    ScanDescription: string;
+    FoodSuggested: string[];
+  } | null>(null);
   
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -30,32 +32,39 @@ export function AnalyzePage() {
       alert("Please fill out all fields and upload an image.");
       return;
     }
-
     const formData = new FormData();
     formData.append('weight', servingSize);
-    formData.append('choice', foodName);
+    formData.append('foodName', foodName);
     formData.append('image', selectedFile);
+    formData.append('userId', user?.id || '');
 
     try {
       setLoading(true);
       const response = await fetch('http://localhost:5000/api/upload', {
         method: 'POST',
-        body: formData,
+        body: JSON.stringify({
+          imageFile: selectedFile,
+          servingSize,
+          foodName,
+          userId: user?.id || ''
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
-
       if (!response.ok) {
-        throw new Error('Failed to process the request.');
+        const errorResponse = await response.json();
+        throw new Error(errorResponse.error || 'Failed to process the request.');
       }
-
       const data = await response.json();
       setAnalysisResult(data);
       console.log('Response:', data);
-    } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred while processing the request.');
-    } finally {
-      setLoading(false);
-    }
+  } catch (error) {
+    console.error('Error:', error || error);
+    alert(`Error: ${error || 'An error occurred while processing the request.'}`);
+  } finally {
+    setLoading(false);
+  }
   };
 
   const handleDragOver = (event: React.DragEvent) => {
@@ -181,40 +190,59 @@ export function AnalyzePage() {
                   <>
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <h3 className="text-lg font-medium mb-2">Final Rating</h3>
-                      <p className="text-emerald-700">{analysisResult[0]}</p>
-                    </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h3 className="text-lg font-medium mb-2">Nutritional Info</h3>
-                      <ul className="list-disc list-inside text-gray-700">
-                        {Object.entries(analysisResult[1]).map(([key, value]) => (
-                          <li key={key}>
-                            {key.replace(/_/g, ' ')}: {typeof value === 'number' ? <span>{value.toFixed(2)}</span> : value}
-                          </li>
-                        ))}
-                      </ul>
+                      <p className="text-emerald-700">{analysisResult.FinalRating}</p>
                     </div>
                   </>
                 ) : (
-                  <p className="text-gray-500">Upload an image to see the results.</p>
+                  <p className="text-gray-500">Click Process to see the Final Rating.</p>
                 )}
               </div>
             )}
               </div>
 
               <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-medium mb-2">Recommended Amount and Scan Description</h3>
-                <p className="text-gray-700">{selectedFile ? 'Processing...' : 'Upload to check Recommended Amount'}</p>
-                <p className="text-sm text-gray-500 mt-1">{selectedFile ? '' : ''}</p>
+              {loading ? (
+              <div className="flex justify-center items-center h-full">
+                <div className="loader border-t-4 border-b-4 border-emerald-600 rounded-full w-12 h-12 animate-spin"></div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {analysisResult ? (
+                  <>                    
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h3 className="text-lg font-medium mb-2">Nutritional Info</h3>
+                      <ul className="list-disc list-inside text-gray-700">{analysisResult.ScanDescription}</ul>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-gray-500">Click Process to see the Scan Description.</p>
+                )}
+              </div>
+            )}
               </div>
 
               <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-lg font-medium mb-2 flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-amber-500" />
-                  Other Food Suggested
-                </h3>
-                <ul className="list-disc list-inside text-gray-700">
-                  {selectedFile ? <li>Processing...</li> : <li>Upload to check Allergen Info</li>}
-                        </ul>
+              {loading ? (
+              <div className="flex justify-center items-center h-full">
+                <div className="loader border-t-4 border-b-4 border-emerald-600 rounded-full w-12 h-12 animate-spin"></div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {analysisResult ? (
+                  <>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h3 className="text-lg font-medium mb-2">Other Food Suggested</h3>
+                      <ul className="list-disc list-inside text-gray-700">
+                      {analysisResult.FoodSuggested}
+                      </ul>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-gray-500">Click Process to see other Food Suggestions.</p>
+                )}
+              </div>
+            )}
+              </div>
               </div>
             </div>
           </div>
@@ -238,6 +266,5 @@ export function AnalyzePage() {
 </div>
 
       </div>
-    </div>
   );
 }

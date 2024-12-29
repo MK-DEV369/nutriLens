@@ -15,16 +15,16 @@ function App() {
   useEffect(() => {
     if (user) {
       console.log('User ID:', user.id);
-      
-      axios.get(`http://localhost:5000/api/check-user-data/${user.id}`)
-        .then(response => {
+      axios
+        .get(`http://localhost:5000/api/check-user-data/${user.id}`)
+        .then((response) => {
           if (!response.data.exists) {
             setShowModal(true);
           } else {
             console.log('User data fetched successfully');
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('Error fetching user data:', error);
           setShowModal(true);
         });
@@ -59,11 +59,21 @@ function App() {
     }
   };
 
+  const renderPage = () => {
+    switch (path) {
+      case '/analyze':
+        return <AnalyzePage />;
+      case '/history':
+        return <HistoryPage />;
+      default:
+        return <HomePage />;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100">
       <Navbar />
-      {path === '/analyze' ? <AnalyzePage /> : <HomePage />}
-      {path === '/history' ? <HistoryPage /> : <HomePage />}
+      {renderPage()}
       {showModal && <Modal onSave={handleSaveData} />}
     </div>
   );

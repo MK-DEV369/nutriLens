@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import ReactCrop, { Crop, PixelCrop} from 'react-image-crop';
+import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
 interface CropModalProps {
@@ -8,20 +8,8 @@ interface CropModalProps {
   onSave: (croppedImage: File) => void;
 }
 
-interface CustomCrop extends Omit<Crop, 'aspect'> {
-  aspect?: number;
-}
-
 const CropModal: React.FC<CropModalProps> = ({ imageFile, onClose, onSave }) => {
-  const [crop, setCrop] = useState<CustomCrop>({
-    unit: "%",
-    width: 100,
-    height: 100,
-    aspect: 1,
-    x: 0,
-    y: 0,
-  });
-  
+  const [crop, setCrop] = useState<Crop>({ unit: "%", x: 0, y: 0, width: 50, height: 50 });
   const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -33,58 +21,66 @@ const CropModal: React.FC<CropModalProps> = ({ imageFile, onClose, onSave }) => 
     };
   }, []);
 
-  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const { width, height } = e.currentTarget;
-    const aspectRatio = Math.min(width, height) / Math.max(width, height);
-    setCrop({
-      unit: "%",
-      width: 100,
-      height: 100,
-      aspect: aspectRatio,
-      x: 0,
-      y: 0,
-    });
+  const handleImageLoad = () => {
+    // Avoid resetting the crop state after user interaction
+    if (!completedCrop) {
+      setCrop({
+        unit: "%",
+        x: 10,
+        y: 10,
+        width: 80,
+        height: 80,
+      });
+    }
   };
-  
 
   const generateCroppedImage = () => {
     if (!completedCrop || !imageRef.current || !previewCanvasRef.current) {
       console.error("Incomplete crop or missing references.");
       return;
     }
-  
-    const image = imageRef.current;
+
     const canvas = previewCanvasRef.current;
     const ctx = canvas.getContext('2d');
-  
+    const image = imageRef.current;
+
     if (!ctx || !completedCrop.width || !completedCrop.height) {
-      console.error("Canvas context is missing or crop dimensions are undefined.");
+      console.error("Canvas context is missing or crop dimensions are invalid.");
       return;
     }
-  
-    //const aspectRatio = completedCrop.width / completedCrop.height;
+
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+
     canvas.width = Math.floor(completedCrop.width);
     canvas.height = Math.floor(completedCrop.height);
-  
+
     ctx.drawImage(
       image,
-      completedCrop.x, completedCrop.y, completedCrop.width, completedCrop.height,
-      0, 0, completedCrop.width, completedCrop.height
+      completedCrop.x * scaleX,
+      completedCrop.y * scaleY,
+      completedCrop.width * scaleX,
+      completedCrop.height * scaleY,
+      0,
+      0,
+      completedCrop.width,
+      completedCrop.height
     );
-  
+
     canvas.toBlob(async (blob) => {
       if (blob) {
-        const formData = new FormData();
-        formData.append('image', blob, 'table-image.png');
-  
+        const croppedImage = new File([blob], 'table-image.png', { type: blob.type });
         try {
+          const formData = new FormData();
+          formData.append('image', croppedImage);
+
           const response = await fetch('http://localhost:5000/api/upload', {
             method: 'POST',
             body: formData,
           });
-  
+
           if (response.ok) {
-            onSave(new File([blob], 'table-image.png', { type: 'image/png' }));
+            onSave(croppedImage);
           } else {
             alert('Failed to upload image');
           }
@@ -94,18 +90,6 @@ const CropModal: React.FC<CropModalProps> = ({ imageFile, onClose, onSave }) => 
         }
       }
     }, 'image/png');
-  };
-  
-  const onCropComplete = (c: Crop | undefined) => {
-    if (c) {
-      console.log("Completed crop:", c);
-      setCompletedCrop({
-        ...c,
-        unit: "px",
-        width: Math.max(100, c.width),
-        height: Math.max(100, c.height),
-      });
-    }
   };
 
   return (
@@ -121,7 +105,7 @@ const CropModal: React.FC<CropModalProps> = ({ imageFile, onClose, onSave }) => 
             <ReactCrop
               crop={crop}
               onChange={(newCrop) => setCrop(newCrop)}
-              onComplete={onCropComplete}
+              onComplete={(c) => setCompletedCrop(c as PixelCrop)}
               className="max-w-full"
             >
               <img

@@ -29,7 +29,6 @@ export function HomePage() {
           </button>
         </div>
 
-        {/* Features Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {[
             {
@@ -38,11 +37,11 @@ export function HomePage() {
             },
             {
               title: "Health Recommendations",
-              description: "Get personalized dietary suggestions based on your needs"
+              description: "Get personalized food suggestions based on your needs"
             },
             {
-              title: "Allergen Detection",
-              description: "Identify potential allergens and dietary restrictions"
+              title: "Nutrition Chatbot Integrated",
+              description: "Identify healthy and unhealthy nutrients in your food"
             }
           ].map((feature, index) => (
             <div key={index} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition">
