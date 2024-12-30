@@ -14,76 +14,85 @@ from pathlib import Path
 import re
 from rapidfuzz import process, fuzz
 import pandas as pd
+import asyncio
 import os
 
 # %%
 # Initialize PaddleOCR
 ocr = PaddleOCR(lang='en')
+base_image_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'components', 'scan', 'table-image'))
 
-# Define the image path
-image_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'components', 'scan', 'table-image.png'))
-
+def get_image_path():
+    for ext in ['.png', '.jpg']:
+        image_path = base_image_path + ext
+        if os.path.exists(image_path):
+            return image_path
+    return None
+image_path = get_image_path()
+if image_path is None:
+    print("No table image found. Please ensure 'table-image.png' or 'table-image.jpg' exists in the specified directory.")
+    exit(1)
 
 # %%
-def preprocess_image(image_path):
+async def preprocess_image(image_path):
     print(f"Attempting to open image at path: {image_path}")
     # Check if the file exists
     if not os.path.isfile(image_path):
-        raise FileNotFoundError(f"The file {image_path} does not exist.")
-        
+        raise FileNotFoundError(f"The file {image_path} does not exist.")        
     # Load image
-    image = cv2.imread(str(image_path))
-    
+    image = cv2.imread(str(image_path))    
     # Check if the image was loaded successfully
     if image is None:
-        raise ValueError(f"Unable to open image file: {image_path}")
-    
+        raise ValueError(f"Unable to open image file: {image_path}")    
     # Convert to grayscale
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)    
     # Apply Gaussian Blur to reduce noise
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-    
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)    
     # Use adaptive thresholding to enhance text visibility
     thresholded = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
-                                        cv2.THRESH_BINARY, 11, 2)
-    
+                                        cv2.THRESH_BINARY, 11, 2)    
     # Resize image if necessary (for better OCR accuracy)
     resized = cv2.resize(thresholded, (0, 0), fx=1.5, fy=1.5)
-
     return resized
-
-
-
 
 # %%
 # Preprocess the image before OCR
-image = preprocess_image(image_path)
+async def watch_for_changes(image_path):
+    while True:
+        await asyncio.sleep(2)  # Wait for 1 second before checking again
+        try:
+            image = await preprocess_image(image_path)
+            yield image
+        except Exception as e:
+            print(f"Error processing image: {e}")
 
 # Save the cleaned image to a new file
-cv2.imwrite("cleaned_image.jpg", image)
+async def process_image():
+    async for image in watch_for_changes(image_path):
+        cv2.imwrite("cleaned_image.jpg", image)
+        ocr_results = ocr.ocr("cleaned_image.jpg")
+        print(ocr_results)
+        return ocr_results, image
 
-# %%
-image_path="cleaned_image.jpg"
+ocr_results = asyncio.run(process_image())
 
-# Perform OCR on the image
-ocr_results = ocr.ocr(image_path)
-
-print(ocr_results)
-
-
-# %%
 # Extract Bounding Boxes
-boxes=[]
-texts=[]
-probabilities=[]
-for line in ocr_results:
-    # print(line)
-    for i in line:
-        boxes.append(i[0])
-        texts.append(i[1][0])
-        probabilities.append(i[1][1])
+def extract_ocr_info(ocr_results):
+    boxes = []
+    texts = []
+    probabilities = []
+    for line in ocr_results:
+        for i in line:
+            if isinstance(i[1], list) and len(i[1]) >= 2:
+                boxes.append(i[0])
+                texts.append(i[1][0])
+                probabilities.append(i[1][1])
+            else:
+                print(f"Skipping unexpected data format: {i}")
+    return boxes, texts, probabilities
 
+# Replace the existing loop with this function call
+boxes, texts, probabilities = extract_ocr_info(ocr_results)
 print(boxes)
 print(texts)
 print(probabilities)
@@ -93,25 +102,29 @@ print(probabilities)
 def highlight_boxes_with_probabilities(image_path, ocr_results):
     # Load the image
     image = cv2.imread(image_path)
-
     # Loop through OCR results and highlight regions (boxes) on the image
     for line in ocr_results:
         for i in line:
-            # Get bounding box coordinates (points)
-            box = np.array(i[0], dtype=np.int32)  # Coordinates of the box
-            text = i[1][0]  # Extracted text
-            probability = i[1][1]  # Probability (confidence score)
-            
-            # Draw the bounding box around the detected text with a dark color
-            points = box.reshape((-1, 1, 2))
-            cv2.polylines(image, [points], isClosed=True, color=(0, 0, 255), thickness=2)  # Dark Red
-            
-            # Place the probability text near the bounding box in dark color
-            x_min = np.min(box[:, 0])
-            y_min = np.min(box[:, 1])
-            cv2.putText(image, f'{probability:.2f}', (x_min, y_min - 10), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2, cv2.LINE_AA)  # Dark Red text
-    
+            try:
+                # Get bounding box coordinates (points)
+                box = np.array(i[0], dtype=np.int32)  # Coordinates of the box                
+                # Ensure the box has exactly 4 points
+                if len(box) != 4:
+                    print(f"Skipping box with incorrect number of points: {len(box)}")
+                    continue                
+                text = i[1][0]  # Extracted text
+                probability = i[1][1]  # Probability (confidence score)
+                # Draw the bounding box around the detected text with a dark color
+                points = box.reshape((-1, 1, 2))
+                cv2.polylines(image, [points], isClosed=True, color=(0, 0, 255), thickness=2)  # Dark Red
+                # Place the probability text near the bounding box in dark color
+                x_min = np.min(box[:, 0])
+                y_min = np.min(box[:, 1])
+                cv2.putText(image, f'{probability:.2f}', (x_min, y_min - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2, cv2.LINE_AA)  # Dark Red text
+            except Exception as e:
+                print(f"Error processing box: {e}")
+                continue
     # Save or display the image with highlighted boxes and probabilities
     output_image_path = 'highlighted_image_dark.jpg'
     cv2.imwrite(output_image_path, image)
@@ -149,6 +162,7 @@ print(row_group)
 
 # %%
 # Save the image with detected table regions
+image = cv2.imread(image_path)
 cv2.imwrite("detected_tables.jpg", image)
 
 # %%
@@ -238,8 +252,8 @@ print(out_array)
 unordered_boxes = []
 
 for i in vert_lines:
-  print(vert_boxes[i])
-  unordered_boxes.append(vert_boxes[i][0])
+    print(vert_boxes[i])
+    unordered_boxes.append(vert_boxes[i][0])
 
 # %%
 ordered_boxes = np.argsort(unordered_boxes)
@@ -247,7 +261,7 @@ print(ordered_boxes)
 
 # %%
 def intersection(box_1, box_2):
-  return [box_2[0], box_1[1],box_2[2], box_1[3]]
+    return [box_2[0], box_1[1],box_2[2], box_1[3]]
 
 # %%
 def iou(box_1, box_2):

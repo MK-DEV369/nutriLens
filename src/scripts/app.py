@@ -54,7 +54,7 @@ async def handle_request():
         #         "ScanDescription": scan_description,
         #     }
         #     history_collection.insert_one(history_entry)
-        return jsonify({"FinalRating": final_rating}) #, "ScanDescription": scan_description
+        return jsonify({"FinalRating": final_rating, "CriticalValues":critical_values}) #, "ScanDescription": scan_description
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

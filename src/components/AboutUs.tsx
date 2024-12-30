@@ -4,6 +4,7 @@ import ajay from "./images/ajay.jpg";
 import morya from "./images/morya.jpg";
 import srikanth from "./images/srikanth.jpg";
 import nihal from "./images/nihal.jpg";
+import nikhil from "./images/nikhil.jpg";
 
 interface TeamMember {
   name: string;
@@ -29,13 +30,13 @@ const teamMembers: TeamMember[] = [
     }
   },
   {
-    name: "Nikhil",
+    name: "Nikhil Bakale",
     role: "UI/UX Designer",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop",
+    image: nikhil,
     bio: "Creative designer focused on crafting intuitive and beautiful user experiences in healthcare applications.",
     social: {
-      github: "#",
-      linkedin: "#"
+      github: "https://github.com/NikhilParashuramBakale",
+      linkedin: "https://www.linkedin.com/in/nikhil-bakale-a9b797293/"
     }
   },
   {
@@ -54,8 +55,8 @@ const teamMembers: TeamMember[] = [
     image: srikanth,
     bio: "Systems architect specializing in scalable infrastructure and machine learning implementations.",
     social: {
-      github: "#",
-      linkedin: "#"
+      github: "https://github.com/srikanthrayudu",
+      linkedin: "https://www.linkedin.com/in/srikanth-rayudu-6a5ab2279/"
     }
   },
   {

@@ -7,13 +7,14 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "node server.js",
-    "dev": "\"vite --host\" concurrently \"npm start\" \"npm run dev-backend\" ",
-    "dev-backend": "nodemon --watch scripts --exec python scripts/app.py"
+    "start": "node src/server.js",
+    "dev": "concurrently \"npm start\" \"npm run dev-backend\" \"vite --host\"",
+    "dev-backend": "nodemon --watch scripts --exec python src/scripts/app.py"
   },
-    "dependencies": {
+  "dependencies": {
     "@clerk/clerk-react": "^5.20.2",
     "@clerk/nextjs": "^6.9.2",
+    "@google/generative-ai": "^0.21.0",
     "@mediapipe/camera_utils": "^0.3.1675466862",
     "axios": "^1.7.9",
     "cors": "^2.8.5",
@@ -41,6 +42,7 @@
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.11",
     "globals": "^15.9.0",
+    "nodemon": "^3.1.9",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.7.2",
