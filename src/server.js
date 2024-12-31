@@ -2,32 +2,12 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import multer from 'multer';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs/promises';
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 app.use(cors());
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const scanDir = path.join(__dirname, 'components', 'scan');
-try {
-  await fs.access(scanDir);
-  console.log('Scan directory exists:', true);
-} catch (err) {
-  if (err.code === 'ENOENT') {
-    await fs.mkdir(scanDir, { recursive: true });
-    console.log('Created scan directory');
-  } else {
-    throw err;
-  }
-}
 
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB connected successfully'))
@@ -62,18 +42,6 @@ const userProfileSchema = new mongoose.Schema({
 });
 
 const UserProfile = mongoose.model('UserProfile', userProfileSchema);
-const History = mongoose.model('History', userProfileSchema);
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, scanDir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, `cropped-${Date.now()}-${file.originalname}`);
-  },
-});
-
-const upload = multer({ storage });
 
 app.post('/api/user-data', async (req, res) => {
   console.log('Received POST request to /api/user-data');
@@ -81,15 +49,23 @@ app.post('/api/user-data', async (req, res) => {
   try {
     const { clerkId, age, gender, specialNeeds, weight, height } = req.body;
 
+    console.log('Extracted parameters:', { clerkId, age, gender, specialNeeds, weight, height });
+
     if (!clerkId || !age || !gender || !weight || !height) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
+    if (typeof age !== 'number' || typeof weight !== 'number' || typeof height !== 'number') {
+      return res.status(400).json({ error: 'Age, Weight, and Height must be numbers' });
+    }
+
+    console.log('Checking for existing profile...');
     const existingProfile = await UserProfile.findOne({ clerkId });
     if (existingProfile) {
       return res.status(409).json({ message: 'Profile already exists' });
     }
 
+    console.log('Creating new profile...');
     const newProfile = new UserProfile({
       clerkId,
       age,
@@ -99,39 +75,14 @@ app.post('/api/user-data', async (req, res) => {
       height,
     });
 
+    console.log('Saving new profile...');
     await newProfile.save();
+
+    console.log('Profile saved successfully');
     res.status(201).json({ message: 'Profile saved successfully', userId: clerkId });
   } catch (error) {
     console.error('Error saving profile:', error);
     res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-app.post('/api/upload', upload.single('image'), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'No file uploaded' });
-  }
-
-  try {
-    const tempFilePath = req.file.path;
-    const targetFileName = 'table-image.png';
-    const targetFilePath = path.join(scanDir, targetFileName);
-
-    try {
-      await fs.access(targetFilePath);
-      await fs.unlink(targetFilePath);
-      console.log('Deleted existing table-image.png');
-    } catch (err) {
-      if (err.code !== 'ENOENT') throw err;
-    }
-
-    await fs.rename(tempFilePath, targetFilePath);
-
-    console.log('File renamed and moved to:', targetFilePath);
-    res.status(200).json({ message: 'File uploaded and renamed successfully', filePath: targetFilePath });
-  } catch (error) {
-    console.error('Error handling file:', error);
-    res.status(500).json({ error: 'Failed to handle file' });
   }
 });
 
@@ -151,17 +102,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/api/history', async (req, res) => {
-  try {
-    const userId = req.query.userId; // Optional: filter by user ID if needed
-    const history = await History.find({ userId }); // Adjust schema and query as per your DB
-    res.status(200).json(history);
-  } catch (error) {
-    console.error("Error fetching history data:", error);
-    res.status(500).json({ error: "Failed to fetch history data" });
-  }
-});
-
 app.get('/api/user-profiles', async (req, res) => {
   try {
     const profiles = await UserProfile.find();
@@ -171,6 +111,7 @@ app.get('/api/user-profiles', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 app.get('/', (req, res) => {
   res.send('Welcome to the NutriLens API!');

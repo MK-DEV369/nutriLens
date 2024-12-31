@@ -5,7 +5,7 @@ import { Navbar } from './components/Navbar';
 import { HomePage } from './components/HomePage';
 import { AnalyzePage } from './components/AnalyzePage';
 import Modal from './components/Modal';
-import HistoryPage from './components/HistoryPage';
+import { Chatbot } from './services/Chatbot';
 
 function App() {
   const { user } = useUser();
@@ -63,8 +63,6 @@ function App() {
     switch (path) {
       case '/analyze':
         return <AnalyzePage />;
-      case '/history':
-        return <HistoryPage />;
       default:
         return <HomePage />;
     }
@@ -75,6 +73,7 @@ function App() {
       <Navbar />
       {renderPage()}
       {showModal && <Modal onSave={handleSaveData} />}
+      <Chatbot />
     </div>
   );
 }

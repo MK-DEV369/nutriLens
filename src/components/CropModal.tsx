@@ -22,7 +22,6 @@ const CropModal: React.FC<CropModalProps> = ({ imageFile, onClose, onSave }) => 
   }, []);
 
   const handleImageLoad = () => {
-    // Avoid resetting the crop state after user interaction
     if (!completedCrop) {
       setCrop({
         unit: "%",
@@ -69,25 +68,8 @@ const CropModal: React.FC<CropModalProps> = ({ imageFile, onClose, onSave }) => 
 
     canvas.toBlob(async (blob) => {
       if (blob) {
-        const croppedImage = new File([blob], 'table-image.png', { type: blob.type });
-        try {
-          const formData = new FormData();
-          formData.append('image', croppedImage);
-
-          const response = await fetch('http://localhost:5000/api/upload', {
-            method: 'POST',
-            body: formData,
-          });
-
-          if (response.ok) {
-            onSave(croppedImage);
-          } else {
-            alert('Failed to upload image');
-          }
-        } catch (error) {
-          console.error('Upload error:', error);
-          alert('Failed to upload image');
-        }
+        const croppedImage = new File([blob], 'cropped-img.png', { type: blob.type });
+        onSave(croppedImage);
       }
     }, 'image/png');
   };

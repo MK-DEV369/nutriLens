@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
-import { Chatbot } from './Chatbot';
 
 export function Navbar() {
   const handleNavigation = (e: React.MouseEvent, path: string) => {
@@ -45,13 +44,6 @@ export function Navbar() {
             >
               Analyze
             </NavLink>
-            <NavLink 
-              href="/history" 
-              onClick={(e) => handleNavigation(e, '/history')}
-              isActive={isCurrentPath('/history')}
-            >
-              History
-            </NavLink>
           </div>
           <div className="flex sticky space-x-4">
             <SignedOut>
@@ -60,7 +52,6 @@ export function Navbar() {
             <SignedIn>
               <UserButton />
             </SignedIn>
-            <Chatbot />
 
             <button
               className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
@@ -79,9 +70,6 @@ export function Navbar() {
             </NavLink>
             <NavLink href="/analyze" onClick={(e) => handleNavigation(e, '/analyze')} isActive={isCurrentPath('/')}>
               Analyze
-            </NavLink>
-            <NavLink href="/history" onClick={(e) => handleNavigation(e, '/history')} isActive={isCurrentPath('/')}>
-              History
             </NavLink>
           </div>
           <div className="mt-auto flex justify-center">

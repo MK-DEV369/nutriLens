@@ -32,5 +32,6 @@ dist-ssr
 *horiz_vert.jpg
 *im_nms.jpg
 *cleaned_nutrition_data.csv
+*src/backend/DATASET.csv
 *__pycache__
-*src/components/scan/table-image.png
+*src/backend/uploads
