@@ -7,8 +7,7 @@ image_directory = "./src/backend/uploads/captured_img.png"
 def main(choice, weight_of_food):
     try:
         if not os.path.exists(image_directory):
-            raise FileNotFoundError(f"The image file {image_directory} does not exist.")
-        
+            raise FileNotFoundError(f"The image file {image_directory} does not exist.")        
         process_image(image_directory)
         ans = execute_model(choice, weight_of_food)
         return ans

@@ -1,15 +1,9 @@
 import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
+import { Link, NavLink } from 'react-router-dom';
 
 export function Navbar() {
-  const handleNavigation = (e: React.MouseEvent, path: string) => {
-    e.preventDefault();
-    window.location.href = path;
-  };
-
-  const isCurrentPath = (path: string) => window.location.pathname === path;
-
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => {
@@ -20,32 +14,30 @@ export function Navbar() {
     <nav className="bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
-            <a 
-              href="/"
-              onClick={(e) => handleNavigation(e, '/')}
-              className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent"
-            >
-              NutriLens
-            </a>
-          </div>
+          <Link
+            to="/"
+            className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent"
+          >
+            NutriLens
+          </Link>
           <div className="hidden md:flex items-center space-x-8">
-            <NavLink 
-              href="/" 
-              onClick={(e) => handleNavigation(e, '/')}
-              isActive={isCurrentPath('/')}
-            >
+            <NavLink to="/" className={({ isActive }) =>
+              isActive ? 'text-emerald-600' : 'text-gray-600 hover:text-emerald-500'
+            }>
               Home
             </NavLink>
-            <NavLink 
-              href="/analyze" 
-              onClick={(e) => handleNavigation(e, '/analyze')}
-              isActive={isCurrentPath('/analyze')}
-            >
+            <NavLink to="/analyze" className={({ isActive }) =>
+              isActive ? 'text-emerald-600' : 'text-gray-600 hover:text-emerald-500'
+            }>
               Analyze
             </NavLink>
+            <NavLink to="/history" className={({ isActive }) =>
+              isActive ? 'text-emerald-600' : 'text-gray-600 hover:text-emerald-500'
+            }>
+              History
+            </NavLink>
           </div>
-          <div className="flex sticky space-x-4">
+          <div className="flex space-x-4">
             <SignedOut>
               <SignInButton mode="modal" />
             </SignedOut>
@@ -63,13 +55,22 @@ export function Navbar() {
         </div>
       </div>
       {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 bg-gray-100 z-50 p-4">
-          <div className="flex flex-col items-center space-y-6">
-            <NavLink href="/" onClick={(e) => handleNavigation(e, '/')} isActive={isCurrentPath('/')}>
+        <div className="fixed inset-0 bg-white z-50 flex flex-col p-6 animate-slide-in">
+          <button
+            className="self-end text-gray-600 hover:text-gray-900 mb-6"
+            onClick={toggleMobileMenu}
+          >
+            <X className="h-8 w-8" />
+          </button>
+          <div className="flex flex-col items-center space-y-4">
+            <NavLink to="/" onClick={toggleMobileMenu}>
               Home
             </NavLink>
-            <NavLink href="/analyze" onClick={(e) => handleNavigation(e, '/analyze')} isActive={isCurrentPath('/')}>
+            <NavLink to="/analyze" onClick={toggleMobileMenu}>
               Analyze
+            </NavLink>
+            <NavLink to="/history" onClick={toggleMobileMenu}>
+              History
             </NavLink>
           </div>
           <div className="mt-auto flex justify-center">
@@ -78,31 +79,7 @@ export function Navbar() {
             </SignedIn>
           </div>
         </div>
-      )} :
+      )}
     </nav>
-  );
-}
-
-function NavLink({ 
-  href, 
-  children, 
-  isActive, 
-  onClick 
-}: { 
-  href: string; 
-  children: React.ReactNode; 
-  isActive: boolean;
-  onClick: (e: React.MouseEvent) => void;
-}) {
-  return (
-    <a
-      href={href}
-      onClick={onClick}
-      className={`${
-        isActive ? 'text-emerald-600' : 'text-gray-600'
-      } hover:text-emerald-500 px-3 py-2 rounded-md text-sm font-medium transition-colors`}
-    >
-      {children}
-    </a>
   );
 }

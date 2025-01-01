@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Camera, Upload} from 'lucide-react';
 import CropModal from './CropModal';
 import { CameraModal } from './CameraModal';
 import Graphmodule from './Graphsmodule';
-import CalorieHistory from './CalorieHistory';
 import { Blob } from 'buffer';
 import { useUser } from '@clerk/clerk-react';
 
@@ -20,6 +19,14 @@ export function AnalyzePage() {
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [calories, setCalories] = useState<number>(0);
   const { user } = useUser();
+
+  const progressBarWidth = useMemo(() => {
+    if (analysisResult && analysisResult[0] !== undefined && !isNaN(parseFloat(analysisResult[0]))) {
+      const value = parseFloat(analysisResult[0]);
+      return Math.min(Math.max(value, 0), 10) * 10;
+    }
+    return 0;
+  }, [analysisResult]);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -80,8 +87,6 @@ export function AnalyzePage() {
   
       localStorage.setItem('analysis', JSON.stringify(data));
       setAnalysisResult(data);
-      //setCalories(data.ENERGY);
-
       const energyValue = data[1]?.ENERGY*20 || 0;
       setCalories(energyValue);
       calorieCounter += energyValue;
@@ -154,88 +159,107 @@ export function AnalyzePage() {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-emerald-100">
       <div className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-xl font-semibold mb-4">Upload Food Label</h2>
-              <div 
-                className="border-2 border-dashed border-emerald-200 rounded-lg p-8 text-center"
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-              >
-              <div className="flex flex-col items-center gap-4">
+        <div className="bg-white rounded-xl shadow-lg p-6 flex flex-col h-full">
+          <h2 className="text-xl font-semibold mb-4">Upload Food Label</h2>
+          <div
+            className="flex-grow border-2 border-dashed border-emerald-200 rounded-lg p-8 text-center"
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+          >
+            <div className="flex flex-col items-center gap-4">
+              {selectedFile ? (
+                <img
+                  src={URL.createObjectURL(selectedFile)}
+                  alt="Uploaded Preview"
+                  className="w-25 h-25 object-cover rounded-lg border border-gray-300"
+                />
+              ) : (
                 <Upload className="w-12 h-12 text-emerald-600" />
-                <p className="text-gray-600">
-                  {selectedFile ? selectedFile.name : "Drag and drop your image here or"}
-                </p>
-                <div className="flex gap-4">
-                  <label className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition flex items-center gap-2 cursor-pointer">
-                    <Upload className="w-4 h-4" />
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileUpload}
-                      className="hidden"
-                    />
-                    Upload File
-                  </label>
-                  <button 
-                    onClick={() => setShowCameraModal(true)}
-                    className="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition flex items-center gap-2"
-                  >
-                    <Camera className="w-4 h-4" />
-                    Use Camera
-                  </button>
-                    {showCropModal && selectedFile && (
-                      <CropModal
-                        imageFile={selectedFile}
-                        onClose={() => setShowCropModal(false)}
-                        onSave={handleSaveCroppedImage}
-                      />
-                    )}
-                    <CameraModal
-                      isOpen={showCameraModal}
-                      onClose={() => setShowCameraModal(false)}
-                      onCapture={handleCaptureImage}
-                    />
-                </div>
+              )}
+              <p className="text-gray-600">
+                {selectedFile ? "Uploaded Successfully!" : "Drag and drop your image here or"}
+              </p>
+              <div className="flex gap-4">
+                <label className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition flex items-center gap-2 cursor-pointer">
+                  <Upload className="w-4 h-4" />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  Upload File
+                </label>
+                <button
+                  onClick={() => setShowCameraModal(true)}
+                  className="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition flex items-center gap-2"
+                >
+                  <Camera className="w-4 h-4" />
+                  Use Camera
+                </button>
               </div>
-            </div>
-
-            <div className="mt-6 flex gap-4">
-              <div className="w-1/2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Food Name</label>
-                <input
-                  type="text"
-                  value={foodName}
-                  onChange={(e) => setFoodName(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  placeholder="Enter food name"
+              {/* CropModal for cropping the uploaded image */}
+              {showCropModal && selectedFile && (
+                <CropModal
+                  imageFile={selectedFile}
+                  onClose={() => setShowCropModal(false)}
+                  onSave={(croppedImage) => {
+                    setSelectedFile(croppedImage);
+                    setShowCropModal(false);
+                    alert("Image cropped and saved successfully!");
+                  }}
                 />
-              </div>
-              <div className="w-1/2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Serving Size (grams)</label>
-                <input
-                  type="number"
-                  value={servingSize}
-                  onChange={(e) => setServingSize(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  placeholder="Enter serving size"
-                />
-              </div>
+              )}
+              {/* CameraModal for capturing images */}
+              <CameraModal
+                isOpen={showCameraModal}
+                onClose={() => setShowCameraModal(false)}
+                onCapture={handleCaptureImage}
+              />
             </div>
-
-            <button
-              onClick={handleProcess}
-              disabled={loading}
-              className={`mt-4 w-full ${loading ? 'bg-emerald-400' : 'bg-green-600 hover:bg-green-700'
-                } text-white py-2 px-4 rounded-lg transition-all shadow-lg`}
-            >
-              {loading ? 'Processing...' : 'Process'}
-            </button>
           </div>
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-slate-800 text-xl font-semibold mb-4 border-b border-slate-200 pb-2">
-              Analysis Results
-            </h2>
+
+          {/* Food Name and Serving Size Inputs */}
+          <div className="mt-6 flex gap-4">
+            <div className="w-1/2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Food Name</label>
+              <input
+                type="text"
+                value={foodName}
+                onChange={(e) => setFoodName(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                placeholder="Enter food name"
+              />
+            </div>
+            <div className="w-1/2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Serving Size (grams)</label>
+              <input
+                type="number"
+                value={servingSize}
+                onChange={(e) => setServingSize(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                placeholder="Enter serving size"
+              />
+            </div>
+          </div>
+
+          {/* Process Button */}
+          <button
+            onClick={handleProcess}
+            disabled={loading}
+            className={`mt-6 w-full ${loading ? "bg-emerald-400" : "bg-green-600 hover:bg-green-700"} text-white py-2 px-4 rounded-lg transition-all shadow-lg`}
+          >
+            {loading ? "Processing..." : "Process"}
+          </button>
+        </div>
+
+          <div className="bg-white rounded-xl shadow-lg p-6 border-b border-slate-200 pb-2">
+            <div className="flex justify-between">
+              <h2 className="text-slate-800 text-xl font-semibold mb-4 border-b border-slate-200 pb-2">
+                Analysis Results
+              </h2>
+              <Graphmodule />
+            </div>
 
             {loading ? (
               <div className="flex justify-center items-center h-32">
@@ -246,18 +270,20 @@ export function AnalyzePage() {
                 {analysisResult ? (
                   <>
                     <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-lg">
-                      <h3 className="text-emerald-800 text-lg font-semibold mb-2">
+                      <h3 className="text-emerald-800 text-lg font-semibold mb-2 flex items-center gap-2">
                         Final Rating
+                        <span className="text-sm font-medium text-gray-500">
+                          {progressBarWidth ? `${(progressBarWidth / 10).toFixed(1)} / 10` : 'N/A'}
+                        </span>
                       </h3>
-                      <div className="flex items-center">
-                        <div className="relative w-full h-8 bg-emerald-300 rounded-full overflow-hidden">
-                          <div className="absolute top-0 left-0 h-full bg-emerald-600 text-white font-bold flex items-center justify-center">
-                            {analysisResult[0].toFixed(1)} %
-                          </div>
-                          <div className={`absolute top-0 left-0 h-full bg-emerald-500 text-white font-bold transition-all duration-500 ease-in-out`}>
-                            <div className="w-full h-full bg-emerald-600" style={{ width: `${analysisResult[0] * 100}%` }} />
-                          </div>
-                        </div>
+                      <div className="relative w-full h-8 bg-emerald-300 rounded-full overflow-hidden">
+                        <div
+                          className="absolute top-0 left-0 h-full bg-emerald-600 text-white font-bold transition-all duration-500 ease-in-out"
+                          style={{
+                            width: `${progressBarWidth}%`,
+                            transition: 'width 0.5s ease-in-out',
+                          }}
+                        ></div>
                       </div>
                     </div>
                     <div className="bg-slate-50 rounded-lg">
@@ -292,7 +318,6 @@ export function AnalyzePage() {
             )}
           </div>
         </div>
-        <Graphmodule/>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             { activity: 'Walking', time: exerciseTimes.walking, icon: '🚶‍♀' },
@@ -310,7 +335,6 @@ export function AnalyzePage() {
           ))}
         </div>
       </div>
-      <CalorieHistory/>
     </div>
   );
 }
