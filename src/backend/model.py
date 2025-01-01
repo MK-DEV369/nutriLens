@@ -432,37 +432,47 @@ nutrients_dict = {
 }
 
 # Main execution
-def execute_model(choice, weight_of_food):
-    user_dict = findDict(choice)
-    data_dict = csv_to_dict("cleaned_nutrition_data.csv")
-    data_dict = convert_dict_to_rda(user_dict, data_dict, weight_of_food)
-    print(data_dict)
-    good_dict, bad_dict = separate_dict(data_dict)
-    goodx = len(good_dict)
-    badx = len(bad_dict)
-    num_good, den_good, countbenef10, count_rda_good = score_beneficial(good_dict)
-    num_bad, den_bad, countliab10, count_rda_bad = score_liability(bad_dict)
-    final_rating = round((num_good + num_bad) / (den_good + den_bad), 4) if (den_good + den_bad) != 0 else 0
-    print(str(count_rda_good) + "   " + str(count_rda_bad))
-    print(str(goodx) + "goodnum" + str(badx))
-    update = 0
-    if goodx == badx and goodx >= 4:
-        badx += 1
-    if goodx > badx:
-        update = round((((count_rda_good * goodx) - (count_rda_bad * badx)) / ((goodx * 100) - (badx * 100))), 4)
-    elif goodx < badx:
-        update = round((((count_rda_bad * badx) - (count_rda_good * goodx)) / ((goodx * 100) - (badx * 100))), 4)
-        if update < -3:
-            update = -3
-    elif final_rating < 8.5:
-        final_rating += count_rda_good / count_rda_bad if count_rda_bad != 0 else 0
-    print(update)
-    final_rating += update
-    print("Final Rating:", final_rating)
-    data_dict["FINAL_RATING"] = final_rating
-    print(data_dict)
-    append_dict_to_csv(csv_file, data_dict, nutrients_dict)
-    return final_rating, data_dict
+def execute_model(choice,weight_of_food):
+    try:
+        user_dict = findDict(choice)    
+        data_dict = csv_to_dict("cleaned_nutrition_data.csv")
+        data_dict = convert_dict_to_rda(user_dict,data_dict, weight_of_food)
+        print(data_dict)
+        good_dict, bad_dict = separate_dict(data_dict)
+        goodx=len(good_dict)
+        badx=len(bad_dict)
+        num_good, den_good,countbenef10,count_rda_good = score_beneficial(good_dict)
+        num_bad, den_bad ,countliab10,count_rda_bad= score_liability(bad_dict)
+        final_rating = round((num_good + num_bad) / (den_good + den_bad), 4)    
+        print(str(count_rda_good)+"   "+str(count_rda_bad))    
+        print(str(goodx)+"goodnum"+str(badx))
+        update=0
+        if(goodx==badx and goodx>=4):
+            badx+=1
+        if goodx>badx:
+            update=round((((count_rda_good*goodx)-(count_rda_bad*badx))/((goodx*100)-(badx*100))),4)
+        elif goodx<badx:
+            update=round((((count_rda_bad*badx)-(count_rda_good*goodx))/((goodx*100)-(badx*100))),4)
+            if update < -3:
+                update=-3
+        elif final_rating<8.5:
+            final_rating+=count_rda_good/count_rda_bad    
+        print(update)
+        final_rating+=update
+        print("Final Rating:", final_rating)
+        data_dict["FINAL_RATING"] = final_rating
+        print(data_dict)
+        append_dict_to_csv(csv_file, data_dict, nutrients_dict)
+        return final_rating,data_dict
+    except ValueError as ve:
+        print(f"ValueError occurred: {ve}")
+        return None
+    except TypeError as te:
+        print(f"TypeError occurred: {te}")
+        return None
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return None
 
 
 

@@ -68,7 +68,7 @@ const CropModal: React.FC<CropModalProps> = ({ imageFile, onClose, onSave }) => 
 
     canvas.toBlob(async (blob) => {
       if (blob) {
-        const croppedImage = new File([blob], 'cropped-img.png', { type: blob.type });
+        const croppedImage = new File([blob], 'captured_img.png', { type: blob.type });
         onSave(croppedImage);
       }
     }, 'image/png');

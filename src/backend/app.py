@@ -21,7 +21,6 @@ client = MongoClient(MONGODB_URI)
 db = client['nutrilens']
 user_profiles_collection = db['userprofiles']
 
-# Function to convert ObjectId to string
 def object_id_to_string(obj):
     if isinstance(obj, dict):
         return {k: object_id_to_string(v) for k, v in obj.items()}
@@ -43,11 +42,10 @@ def process_image():
     print("Received POST request to /api/upload")
     try:
         weight = request.form.get('weight')
-        choice = request.form.get('foodName')
         image = request.files.get('image')
         user_id = request.form.get('userId')
-        print(f"Received data: weight={weight}, choice={choice}, image={image}, userId={user_id}")
-        if not weight or not choice or not image:
+        print(f"Received data: weight={weight}, image={image}, userId={user_id}")
+        if not weight or not image:
             return jsonify({"error": "Missing required fields"}), 400
         if not user_id:
             return jsonify({"error": "User ID is required"}), 400

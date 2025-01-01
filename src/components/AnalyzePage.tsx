@@ -2,8 +2,13 @@ import React, { useState } from 'react';
 import { Camera, Upload} from 'lucide-react';
 import CropModal from './CropModal';
 import { CameraModal } from './CameraModal';
+import Graphmodule from './Graphsmodule';
+import CalorieHistory from './CalorieHistory';
 import { Blob } from 'buffer';
 import { useUser } from '@clerk/clerk-react';
+
+export let foodItemList: { name: string; calories: number; date: string }[] = [];
+let calorieCounter = 0;
 
 export function AnalyzePage() {
   const [foodName, setFoodName] = useState('');
@@ -24,13 +29,13 @@ export function AnalyzePage() {
     }
   };
 
-  const handleProcess = async () => {    
+  const handleProcess = async () => {
     console.log("Starting handleProcess");
     if (!selectedFile || !servingSize || !foodName) {
       alert("Please fill out all fields and upload an image.");
       return;
     }
-
+  
     const formData = new FormData();
     formData.append('weight', servingSize);
     formData.append('foodName', foodName);
@@ -38,7 +43,7 @@ export function AnalyzePage() {
     if (user) {
       formData.append('userId', user.id);
     }
-
+  
     try {
       setLoading(true);
       console.log("Sending request to http://localhost:5001/api/upload");
@@ -46,7 +51,7 @@ export function AnalyzePage() {
         method: 'POST',
         body: formData,
       });
-      console.log("Response received:", response.status, response.statusText);
+  
       if (!response.ok) {
         const contentType = response.headers.get('content-type') || '';
         if (contentType.includes('application/json')) {
@@ -60,15 +65,39 @@ export function AnalyzePage() {
         }
       }
   
-
       const data = await response.json();
+      console.log('Response:', data[1]);
+  
+      if (data === null) {
+        console.error('Received null response from the server');
+        throw new Error('Server returned null data');
+      }
+  
+      if (typeof data !== 'object' || data === null) {
+        console.error('Invalid response data:', data);
+        throw new Error('Invalid response data');
+      }
+  
       localStorage.setItem('analysis', JSON.stringify(data));
       setAnalysisResult(data);
-      setCalories(data.calories);
-      console.log('Response:', data);
+      //setCalories(data.ENERGY);
+
+      const energyValue = data[1]?.ENERGY*20 || 0;
+      setCalories(energyValue);
+      calorieCounter += energyValue;
+      foodItemList.push({
+        name: foodName,
+        calories: energyValue,
+        date: new Date().toISOString().split('T')[0],
+      });
+      console.log('Global Food Item List:', foodItemList);
     } catch (error) {
       console.error('Error:', error);
-      alert('An error occurred while processing the request.');
+      if (error instanceof Error) {
+        alert('An error occurred while processing the request: ' + error.message);
+      } else {
+        alert('An unexpected error occurred while processing the request.');
+      }
     } finally {
       setLoading(false);
     }
@@ -88,8 +117,12 @@ export function AnalyzePage() {
     };
     return times;
   };
-  const exerciseTimes = analysisResult ? calculateExerciseTimes(analysisResult[1].ENERGY) : {
-    walking: "NA", jogging: "NA", cycling: "NA", swimming: "NA"
+  const exerciseTimes = analysisResult 
+  ? calculateExerciseTimes(analysisResult[1].ENERGY*20) : {
+    walking: "NA", 
+    jogging: "NA", 
+    cycling: "NA", 
+    swimming: "NA"
   };
 
   const handleDragOver = (event: React.DragEvent) => {
@@ -112,7 +145,7 @@ export function AnalyzePage() {
   
     const handleCaptureImage = async (blob: Blob) => {
       const blobArray = await blob.arrayBuffer();
-      const file = new File([new Uint8Array(blobArray)], 'captured-image.png', { type: 'image/png' });
+      const file = new File([new Uint8Array(blobArray)], 'captured_img.png', { type: 'image/png' });
       setSelectedFile(file);
       setShowCropModal(true);
       setShowCameraModal(false);
@@ -219,10 +252,10 @@ export function AnalyzePage() {
                       <div className="flex items-center">
                         <div className="relative w-full h-8 bg-emerald-300 rounded-full overflow-hidden">
                           <div className="absolute top-0 left-0 h-full bg-emerald-600 text-white font-bold flex items-center justify-center">
-                            {analysisResult[0]}
+                            {analysisResult[0].toFixed(1)} %
                           </div>
                           <div className={`absolute top-0 left-0 h-full bg-emerald-500 text-white font-bold transition-all duration-500 ease-in-out`}>
-                            <div className="w-full h-full bg-emerald-600" style={{ width: `${analysisResult[0] * 10}%` }} />
+                            <div className="w-full h-full bg-emerald-600" style={{ width: `${analysisResult[0] * 100}%` }} />
                           </div>
                         </div>
                       </div>
@@ -234,13 +267,14 @@ export function AnalyzePage() {
                         </h3>
                         <ul className="divide-y divide-slate-200">
                         {Object.entries(analysisResult[1]).map(([key, value]) => (
-                          key !== 'final_rating' ? (
+                          key !== 'FINAL_RATING' && key !== 'IGNORE' ? (
                             <li key={key} className="flex justify-between p-3 hover:bg-slate-100 transition-colors">
                               <span className="font-medium text-slate-600 capitalize">
                                 {key.replace(/_/g, ' ')}
                               </span>
                               <span className="text-emerald-600 font-semibold">
-                                {value}
+                              {Number(value).toFixed(2)}
+
                               </span>
                             </li>
                           ) : null
@@ -258,7 +292,7 @@ export function AnalyzePage() {
             )}
           </div>
         </div>
-
+        <Graphmodule/>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             { activity: 'Walking', time: exerciseTimes.walking, icon: '🚶‍♀' },
@@ -276,6 +310,7 @@ export function AnalyzePage() {
           ))}
         </div>
       </div>
+      <CalorieHistory/>
     </div>
   );
 }
