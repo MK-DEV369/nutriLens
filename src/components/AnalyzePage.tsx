@@ -3,6 +3,7 @@ import { Camera, Upload} from 'lucide-react';
 import CropModal from './CropModal';
 import { CameraModal } from './CameraModal';
 import { Blob } from 'buffer';
+import { useUser } from '@clerk/clerk-react';
 
 export function AnalyzePage() {
   const [foodName, setFoodName] = useState('');
@@ -13,6 +14,7 @@ export function AnalyzePage() {
   const [loading, setLoading] = useState(false); // Loader state
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [calories, setCalories] = useState<number>(0);
+  const { user } = useUser();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -33,6 +35,9 @@ export function AnalyzePage() {
     formData.append('weight', servingSize);
     formData.append('foodName', foodName);
     formData.append('image', selectedFile);
+    if (user) {
+      formData.append('userId', user.id);
+    }
 
     try {
       setLoading(true);
@@ -60,7 +65,6 @@ export function AnalyzePage() {
       localStorage.setItem('analysis', JSON.stringify(data));
       setAnalysisResult(data);
       setCalories(data.calories);
-
       console.log('Response:', data);
     } catch (error) {
       console.error('Error:', error);
@@ -119,11 +123,11 @@ export function AnalyzePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h2 className="text-xl font-semibold mb-4">Upload Food Label</h2>
-            <div 
-              className="border-2 border-dashed border-emerald-200 rounded-lg p-8 text-center"
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-            >
+              <div 
+                className="border-2 border-dashed border-emerald-200 rounded-lg p-8 text-center"
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+              >
               <div className="flex flex-col items-center gap-4">
                 <Upload className="w-12 h-12 text-emerald-600" />
                 <p className="text-gray-600">
@@ -213,20 +217,24 @@ export function AnalyzePage() {
                         Final Rating
                       </h3>
                       <div className="flex items-center">
-                        <p className="text-emerald-700 text-2xl font-bold">
-                          {analysisResult[0]}
-                        </p>
-                        <div className="ml-2 h-8 w-1 bg-emerald-300 rounded-full"></div>
+                        <div className="relative w-full h-8 bg-emerald-300 rounded-full overflow-hidden">
+                          <div className="absolute top-0 left-0 h-full bg-emerald-600 text-white font-bold flex items-center justify-center">
+                            {analysisResult[0]}
+                          </div>
+                          <div className={`absolute top-0 left-0 h-full bg-emerald-500 text-white font-bold transition-all duration-500 ease-in-out`}>
+                            <div className="w-full h-full bg-emerald-600" style={{ width: `${analysisResult[0] * 10}%` }} />
+                          </div>
+                        </div>
                       </div>
                     </div>
-
                     <div className="bg-slate-50 rounded-lg">
                       <div className="border border-slate-200 rounded-lg divide-y divide-slate-200">
                         <h3 className="text-slate-700 text-lg font-semibold p-4">
                           Nutritional Info
                         </h3>
                         <ul className="divide-y divide-slate-200">
-                          {Object.entries(analysisResult[1]).map(([key, value]) => (
+                        {Object.entries(analysisResult[1]).map(([key, value]) => (
+                          key !== 'final_rating' ? (
                             <li key={key} className="flex justify-between p-3 hover:bg-slate-100 transition-colors">
                               <span className="font-medium text-slate-600 capitalize">
                                 {key.replace(/_/g, ' ')}
@@ -235,14 +243,15 @@ export function AnalyzePage() {
                                 {value}
                               </span>
                             </li>
-                          ))}
-                        </ul>
+                          ) : null
+                        ))}
+                      </ul>
                       </div>
                     </div>
                   </>
                 ) : (
                   <div className="text-center py-8">
-                    <p className="text-slate-500">Upload an image to see the results.</p>
+                    <p className="text-slate-500">Click Process to see the Results</p>
                   </div>
                 )}
               </div>

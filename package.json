@@ -7,8 +7,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "node src/server.js",
-    "dev": "concurrently \"npm start\" \"vite --host\""
+    "dev": "concurrently \"node src/server.js\" \"vite --host\" \"python src/backend/app.py\""
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.20.2",

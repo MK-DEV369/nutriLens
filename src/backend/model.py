@@ -1,4 +1,6 @@
 import csv
+import json
+import os
 
 men_dict = {
     "PROTEINS": 54,
@@ -45,8 +47,8 @@ women_dict = {
     "VITAMIN_C": 65,
     "VITAMIN_A": 840,
     "SUGAR": 50,
-   "TOTAL_FAT": 67,
-   "SATURATED_FAT": 22, 
+    "TOTAL_FAT": 67,
+    "SATURATED_FAT": 22, 
     "SODIUM": 2000,    
     "VITAMIN_D": 600,
     "CHOLESTEROL":300,
@@ -101,7 +103,7 @@ children_10_12_years_dict = {
     "SUGAR": 50,
     "TOTAL_FAT": 67,
     "SATURATED_FAT": 22,
-     "CHOLESTEROL":300,
+    "CHOLESTEROL":300,
     "CARBOHYDRATES": 130,
 
 }
@@ -128,7 +130,7 @@ children_13_15_years_dict = {
     "SUGAR": 50,
     "TOTAL_FAT": 67,
     "SATURATED_FAT": 22,
-     "CHOLESTEROL":300,
+    "CHOLESTEROL":300,
     "CARBOHYDRATES": 130,
 
 }
@@ -161,7 +163,6 @@ children_16_18_years_dict = {
 }
 
 diabetes_dict = {
-
     "PROTEINS": 60,      # Slightly increased for better glycemic control and muscle health
     "FIBER": 50,         # Higher intake to aid blood sugar regulation
     "CALCIUM": 1000,     # No change; essential for bone health
@@ -237,11 +238,10 @@ hypertension_dict = {
     "CARBOHYDRATES": 130, # Controlled intake of complex carbs, avoiding high-glycemic index foods
     "SATURATED_FAT": 15,  # Reduced to help manage cholesterol and blood pressure
     "SODIUM": 1500 ,       # Reduced sodium intake to help manage hypertension
-     "CHOLESTEROL":200,
+    "CHOLESTEROL":200,
 }
 
-def findDict(choice):
-    
+def findDict(choice):    
     if choice==1:
         d_dict=men_dict
     elif choice==2:
@@ -259,11 +259,9 @@ def findDict(choice):
     elif choice==8:
         d_dict=diabetes_dict
     elif choice==9:
-        d_dict=hypertension_dict
-    
+        d_dict=hypertension_dict 
     return d_dict
 
-# Function to read a CSV file into a dictionary
 def csv_to_dict(csv_file):
     data_dict = {}
     with open(csv_file, mode='r', newline='') as file:
@@ -274,17 +272,13 @@ def csv_to_dict(csv_file):
                 data_dict[key.strip()] = float(value.strip())
     return data_dict
 
-#### how much do u want to consume????
-# Convert per 100g values to RDA percentages
+# Convert per 100g values to RDA percentages based on Consumption
 def convert_to_rda(per100g_value, rda_value, weight_of_food):
     return round(((per100g_value * weight_of_food) / (100 * rda_value)) * 100, 4)
 
 
 ###### gender , age , diabetes , bp , weight , pregnancy
 def convert_dict_to_rda(d_dict,data_dict, weight_of_food):
-    print("hi")
-    print(dict)
-    print("ny")
     return {key: convert_to_rda(value, d_dict[key], weight_of_food) for key, value in data_dict.items()}
 
 # Beneficial nutrients (good impact)
@@ -378,8 +372,7 @@ def score_liability(bad_dict):
         elif arr[0] < value <= arr[1]:
             print("8liab")
             num += 8 * arr[2]  # Reduced penalty
-        else:
-           
+        else:       
             x=value/arr[0]
             x=10-1.5*x
             x = max(-1, 10 - (value / arr[0]) * 1.5)  # Less severe penalty scamling
@@ -388,9 +381,6 @@ def score_liability(bad_dict):
         den += arr[2]
 
     return num, den,countliab10,countrda
-
-import csv
-import os
 
 # File to write the CSV data
 csv_file = "DATASET.csv"
@@ -412,11 +402,8 @@ def append_dict_to_csv(file, data, all_keys):
 
         # Write the row data
         writer.writerow(complete_data)
-
     print(f"Data appended to {file} successfully!")
 
-# List of all possible keys (columns)
-# Missing "Name" and "Age"
 nutrients_dict = {
     "PROTEINS": None,
     "FIBER": None,
@@ -445,52 +432,37 @@ nutrients_dict = {
 }
 
 # Main execution
-def execute_model(choice,weight_of_food):
-
+def execute_model(choice, weight_of_food):
     user_dict = findDict(choice)
-    
-    data_dict = csv_to_dict("cleaned_nutrition_data.csv")  # Example CSV file
-    data_dict = convert_dict_to_rda(user_dict,data_dict, weight_of_food)
+    data_dict = csv_to_dict("cleaned_nutrition_data.csv")
+    data_dict = convert_dict_to_rda(user_dict, data_dict, weight_of_food)
     print(data_dict)
-
     good_dict, bad_dict = separate_dict(data_dict)
-    goodx=len(good_dict)
-    badx=len(bad_dict)
-
-    num_good, den_good,countbenef10,count_rda_good = score_beneficial(good_dict)
-    num_bad, den_bad ,countliab10,count_rda_bad= score_liability(bad_dict)
-
-
-    final_rating = round((num_good + num_bad) / (den_good + den_bad), 4)
-    
-    print(str(count_rda_good)+"   "+str(count_rda_bad))
-    
-    print(str(goodx)+"goodnum"+str(badx))
-    update=0
-    if(goodx==badx and goodx>=4):
-      badx+=1
-    if goodx>badx:
-        update=round((((count_rda_good*goodx)-(count_rda_bad*badx))/((goodx*100)-(badx*100))),4)
-    elif goodx<badx:
-        update=round((((count_rda_bad*badx)-(count_rda_good*goodx))/((goodx*100)-(badx*100))),4)
+    goodx = len(good_dict)
+    badx = len(bad_dict)
+    num_good, den_good, countbenef10, count_rda_good = score_beneficial(good_dict)
+    num_bad, den_bad, countliab10, count_rda_bad = score_liability(bad_dict)
+    final_rating = round((num_good + num_bad) / (den_good + den_bad), 4) if (den_good + den_bad) != 0 else 0
+    print(str(count_rda_good) + "   " + str(count_rda_bad))
+    print(str(goodx) + "goodnum" + str(badx))
+    update = 0
+    if goodx == badx and goodx >= 4:
+        badx += 1
+    if goodx > badx:
+        update = round((((count_rda_good * goodx) - (count_rda_bad * badx)) / ((goodx * 100) - (badx * 100))), 4)
+    elif goodx < badx:
+        update = round((((count_rda_bad * badx) - (count_rda_good * goodx)) / ((goodx * 100) - (badx * 100))), 4)
         if update < -3:
-            update=-3
-
-    elif final_rating<8.5:
-        final_rating+=count_rda_good/count_rda_bad
-    
+            update = -3
+    elif final_rating < 8.5:
+        final_rating += count_rda_good / count_rda_bad if count_rda_bad != 0 else 0
     print(update)
-    final_rating+=update
+    final_rating += update
     print("Final Rating:", final_rating)
-
-
     data_dict["FINAL_RATING"] = final_rating
     print(data_dict)
-
-    # Append the dictionaries to the CSV file
     append_dict_to_csv(csv_file, data_dict, nutrients_dict)
-
-    return final_rating,data_dict
+    return final_rating, data_dict
 
 
 

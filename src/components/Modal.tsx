@@ -93,7 +93,7 @@ export default function Modal({ onSave }: { onSave: OnSaveProps }) {
 
           <fieldset className="space-y-2">
             <legend className="font-semibold">Special Needs</legend>
-            {['Diabetes', 'Obesity', 'High BP', 'Pregnancy', 'Hypertension'].map((need) => (
+            {['Diabetes', 'Obesity', 'Pregnancy', 'Hypertension'].map((need) => (
               <label key={need} className="block">
                 <input
                   type="checkbox"
