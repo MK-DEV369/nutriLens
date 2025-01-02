@@ -137,29 +137,36 @@ Neutral Approach: Avoid medical advice. Encourage consulting a healthcare profes
     const responseText = await response.text(); // Read response as text first
     console.log('Raw API Response:', responseText);
 
-    // Try to parse as JSON
-    let data;
     try {
-      data = JSON.parse(responseText);
+      const data = JSON.parse(responseText);
+      console.log('Parsed Response:', data);
+      if (!data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
+        throw new Error('Unexpected response structure from API');
+      }
+      const content = data.candidates[0].content.parts[0].text;
+      console.log('API Content:', content);
+
+      // Attempt to parse the content as JSON
+      try {
+        const parsedContent = JSON.parse(content);
+        console.log('Parsed Content:', parsedContent);
+
+        const formattedResponse = `\
+          𝑬𝒗𝒂𝒍𝒖𝒂𝒕𝒊𝒐𝒏: ${parsedContent.Evaluation || 'N/A'}\n\
+          𝑹𝒆𝒄𝒐𝒎𝒎𝒆𝒏𝒅𝒂𝒕𝒊𝒐𝒏𝒔: ${parsedContent.Recommendations || 'N/A'}\n\
+          𝑨𝒍𝒕𝒆𝒓𝒏𝒂𝒕𝒊𝒗𝒆𝒔: ${parsedContent.Alternatives?.join(', ') || 'N/A'}`;
+
+        return formattedResponse;
+      } catch (contentParseError) {
+        console.error('Error parsing API content:', contentParseError);
+        return `Error parsing API response. Please check the API output.`;
+      }
     } catch (parseError) {
-      console.error('Response is not valid JSON. Returning raw text.');
-      return responseText; // Return raw text if JSON parsing fails
+      console.error('Error parsing API response:', parseError);
+      return `Failed to parse API response. Please check the API output.`;
     }
-
-    if (!data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
-      throw new Error('Unexpected response structure from API.');
-    }
-
-    console.log('Parsed Response:', data.candidates[0].content.parts[0].text);
-    const parsedData = JSON.parse(data.candidates[0].content.parts[0].text);
-    const formattedResponse = `
-    𝑬𝒗𝒂𝒍𝒖𝒂𝒕𝒊𝒐𝒏: ${parsedData.Evaluation}\n
-    𝑹𝒆𝒄𝒐𝒎𝒎𝒆𝒏𝒅𝒂𝒕𝒊𝒐𝒏𝒔: ${parsedData.Recommendations}\n
-    𝑨𝒍𝒕𝒆𝒓𝒏𝒂𝒕𝒊𝒗𝒆𝒔: ${parsedData.Alternatives.join(', ')}
-    `;
-    return formattedResponse;
   } catch (error) {
     console.error('Error calling Gemini API:', error);
-    throw error;
+    return `Error calling Gemini API: ${error}`;
   }
 }

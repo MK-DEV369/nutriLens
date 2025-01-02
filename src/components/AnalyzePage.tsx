@@ -135,7 +135,7 @@ export function AnalyzePage() {
     return times;
   };
   const exerciseTimes = analysisResult 
-  ? calculateExerciseTimes(analysisResult[1].ENERGY*20) : {
+  ? calculateExerciseTimes(analysisResult[1].ENERGY*10) : {
     walking: "NA", 
     jogging: "NA", 
     cycling: "NA", 
