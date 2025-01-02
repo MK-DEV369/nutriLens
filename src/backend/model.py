@@ -341,19 +341,17 @@ def score_beneficial(good_dict):
     countrda=0
     for key, value in good_dict.items():
         arr = dict_benef[key]
-        countrda+=value
-        if value >= arr[0]:
-            print("10benef")
-            countbenef10+=1
-            num += 10 * arr[2]
-        elif arr[1] <= value < arr[0]:
-            print("8bene")
-            num += 8 * arr[2]
-        else:
-            print("2bene")
-            x = max(2, 10 - (arr[0] / value) * 1.5)
-            num += x * arr[2]
-        den += arr[2]
+        if value >= 1:
+            countrda += value
+            if value >= arr[0]:
+                countbenef10+=1
+                num += 10 * arr[2]
+            elif arr[1] <= value < arr[0]:
+                num += 8 * arr[2]
+            else:
+                x = max(2, 10 - (arr[0] / value) * 1.5)
+                num += x * arr[2]
+            den += arr[2]
     return num, den ,countbenef10,countrda
 
 
@@ -460,6 +458,8 @@ def execute_model(choice,weight_of_food):
         print(update)
         final_rating+=update
         print("Final Rating:", final_rating)
+        if final_rating > 10: 
+            final_rating = 9.5
         data_dict["FINAL_RATING"] = final_rating
         print(data_dict)
         append_dict_to_csv(csv_file, data_dict, nutrients_dict)
@@ -473,84 +473,3 @@ def execute_model(choice,weight_of_food):
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         return None
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# import pandas as pd
-# def update_dataframe_with_dict(csv_file_path, dict_data, output_file_path):
-#     """
-#     This function updates a CSV file's DataFrame with values from a given dictionary.
-
-#     :param csv_file_path: str, path to the input CSV file
-#     :param dict_data: dict, dictionary with key-value pairs to update the DataFrame columns
-#     :param output_file_path: str, path to save the updated CSV file
-#     """
-#     # Load the CSV file into a DataFrame
-#     df = pd.read_csv(csv_file_path)
-
-#     # Iterate over the dictionary and update the DataFrame
-#     for key, value in dict_data.items():
-#         if key in df.columns:
-#             # If the column exists, update it with the dictionary value
-#             df[key] = value
-#         else:
-#             # If the column doesn't exist, add it with the value from the dictionary
-#             df[key] = value
-
-#     # Save the updated DataFrame back to a CSV
-#     df.to_csv(output_file_path, index=False)
-
-#     # Return the updated DataFrame (optional, just for verification or further processing)
-#     return df
-
-# # Example usage
-# csv_file_path = 'BRUHCSV.csv'  # Replace with your actual CSV file path
-# output_file_path = 'updated_file.csv'
-
-# # Call the function
-# updated_df = update_dataframe_with_dict(csv_file_path, data_dict, output_file_path)
-
-# # Print the resulting DataFrame to check the changes
-# print(updated_df)
-
-
-#     ## ADDING REMAINING NUTRIENTS
-#     ## ADD REMAINING DICTS
-#     ## DECIDE ALL INPUTS REQUIRED FROM USER
-#     ## CREATING THE DATASET
-    
-
-# # ## age , gender , pregnency , amount of consumption , (are u consuming the food??) , diabetes , obesity , high bp . weight , height 
-    # elif count_rda_good>count_rda_bad:
-    #     x=10-final_rating
-    #     count=countbenef10+countliab10
-    #     x=x/count
-    #     final_rating+=x

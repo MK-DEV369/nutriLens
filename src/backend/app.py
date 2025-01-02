@@ -1,4 +1,5 @@
 from bson.objectid import ObjectId
+#from bson.objectid import dumps
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
@@ -6,6 +7,8 @@ from main import main
 from pymongo import MongoClient
 from dotenv import load_dotenv
 import json
+from datetime import datetime
+import traceback
 
 load_dotenv()
 app = Flask(__name__)
@@ -20,6 +23,54 @@ MONGODB_URI = os.environ.get("MONGODB_URI")
 client = MongoClient(MONGODB_URI)
 db = client['nutrilens']
 user_profiles_collection = db['userprofiles']
+history_collection = db['history']
+
+@app.route('/save-history', methods=['POST'])
+def save_history():
+    try:
+        data = request.json
+        history_entry = {
+            "userId": data["userId"],
+            "date": datetime.utcnow().strftime('%Y-%m-%d'),
+            "name": data["name"],
+            "final_rating" :data["final_rating"],
+            "calories": data["calories"]
+        }
+        history_collection.insert_one(history_entry)
+        return jsonify({"message": "History entry saved successfully"}), 201
+    except Exception as e:
+        print(f"Error details: {str(e)}")
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/get-history/<userId>', methods=['GET'])
+def get_history(userId):
+    try:
+        print(f"Attempting to retrieve history for user: {userId}")
+        entries = list(history_collection.find({"userId": userId}, {"_id": 0}))
+        if not entries:
+            print(f"No history found for user: {userId}")
+            return jsonify([]), 200
+        print(f"Found {len(entries)} entries for user {userId}")
+        return jsonify(entries), 200
+    except Exception as e:
+        print(f"Error fetching history for user {userId}: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/user-profile/<userId>', methods=['GET'])
+def get_user_profile(userId):
+    try:
+        user_profile = user_profiles_collection.find_one({"clerkId": userId}, {"_id": 0})
+        if not user_profile:
+            return jsonify({"error": "User profile not found"}), 404
+        return jsonify(user_profile), 200
+    except Exception as e:
+        print(f"Error fetching user profile: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
 
 def object_id_to_string(obj):
     if isinstance(obj, dict):
