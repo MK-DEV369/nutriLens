@@ -21,9 +21,9 @@ interface TeamMember {
 const teamMembers: TeamMember[] = [
   {
     name: "L Moryakantha",
-    role: "Lead Developer",
+    role: "AIML",
     image: morya,
-    bio: "Full-stack developer with expertise in AI and machine learning, passionate about creating innovative solutions for health tech.",
+    bio: "Full-stack Developer with expertise in AI and ML, passionate about creating innovative solutions for all tech, be it Front-End, Back-End or Logic Development.",
     social: {
       github: "https://github.com/MK-DEV369",
       linkedin: "https://www.linkedin.com/in/l-moryakantha-0b7222341/",
@@ -31,9 +31,9 @@ const teamMembers: TeamMember[] = [
   },
   {
     name: "Nikhil Bakale",
-    role: "UI/UX Designer",
+    role: "Computer Science",
     image: nikhil,
-    bio: "Creative designer focused on crafting intuitive and beautiful user experiences in healthcare applications.",
+    bio: "Passionate about competitive programming and excel in problem-solving. I contributed to the development of a health rating system by designing its core logic.",
     social: {
       github: "https://github.com/NikhilParashuramBakale",
       linkedin: "https://www.linkedin.com/in/nikhil-bakale-a9b797293/"
@@ -41,9 +41,9 @@ const teamMembers: TeamMember[] = [
   },
   {
     name: "Nihal Soni",
-    role: "Nutrition Specialist",
+    role: "Computer Science",
     image: nihal,
-    bio: "Registered dietitian with a passion for making nutrition information accessible and easy to understand.",
+    bio: "Ambitious about IoT and web development, with strong skills in data cleaning and creating visually appealing, well-structured presentations that effectively convey ideas and concepts",
     social: {
       linkedin: "http://www.linkedin.com/in/nihalsoni2004",
       github: "https://github.com/nihalsoni2004"
@@ -51,9 +51,9 @@ const teamMembers: TeamMember[] = [
   },
   {
     name: "Srikanth",
-    role: "Backend Engineer",
+    role: "Information Science",
     image: srikanth,
-    bio: "Systems architect specializing in scalable infrastructure and machine learning implementations.",
+    bio: "Creative designer focused on crafting intuitive and beautiful UX/UI in Full Stack applications.",
     social: {
       github: "https://github.com/srikanthrayudu",
       linkedin: "https://www.linkedin.com/in/srikanth-rayudu-6a5ab2279/"
@@ -61,12 +61,11 @@ const teamMembers: TeamMember[] = [
   },
   {
     name: "Ajay Reddy",
-    role: "Product Manager",
+    role: "Information Science",
     image: ajay,
-    bio: "Strategic leader with a background in healthcare technology and product development.",
+    bio: "Strategic leader with a background in Computer Vision Techniques including OCR and Image Processing.",
     social: {
       linkedin: "https://www.linkedin.com/in/ajay-reddy-4ab9282a4?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app",
-      twitter: "#",
       github: "https://github.com/ajayrm04",
     }
   }

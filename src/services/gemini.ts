@@ -14,7 +14,6 @@ export async function fetchUserProfile(userId: string): Promise<any> {
   }
 }
 
-//       const response = await generateNutritionalInsights(rating, dict);
 export async function generateNutritionalInsights(rating: string, dict: string, userId: string): Promise<string> {
   if (!apiKey) {
     throw new Error('API key is required');
@@ -134,7 +133,7 @@ Neutral Approach: Avoid medical advice. Encourage consulting a healthcare profes
       throw new Error(`API error: ${response.status}`);
     }
 
-    const responseText = await response.text(); // Read response as text first
+    const responseText = await response.text();
     console.log('Raw API Response:', responseText);
 
     try {
@@ -145,8 +144,6 @@ Neutral Approach: Avoid medical advice. Encourage consulting a healthcare profes
       }
       const content = data.candidates[0].content.parts[0].text;
       console.log('API Content:', content);
-
-      // Attempt to parse the content as JSON
       try {
         const parsedContent = JSON.parse(content);
         console.log('Parsed Content:', parsedContent);
