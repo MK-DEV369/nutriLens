@@ -23,7 +23,7 @@ const CalorieHistory = () => {
     const getApiUrl = () => {
       if (process.env.NODE_ENV === 'development') {
         if (isMobileDevice()) {
-          return 'http://192.168.1.3:5001';
+          return 'http://nutri-lens-seven.vercel.app:5001';
         } else {
           return 'http://localhost:5001';
         }

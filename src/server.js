@@ -7,15 +7,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors({
-  origin: [
-    'http://localhost:5000',
-    'http://192.168.1.3:5000',
-    'https://nutri-lens-seven.vercel.app:5000',
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true, // Allow cookies and credentials
-}));
+app.use(cors());
 
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB connected successfully'))

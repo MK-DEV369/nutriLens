@@ -12,11 +12,7 @@ import traceback
 
 load_dotenv()
 app = Flask(__name__)
-CORS(app, origins=[
-    "http://localhost:5001",
-    "http://192.168.1.3:5001",
-    "https://nutri-lens-seven.vercel.app:5001"
-])
+CORS(app)
 
 UPLOAD_FOLDER = './src/backend/uploads'
 if not os.path.exists(UPLOAD_FOLDER):
