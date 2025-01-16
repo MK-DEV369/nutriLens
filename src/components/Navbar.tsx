@@ -21,19 +21,34 @@ export function Navbar() {
             NutriLens
           </Link>
           <div className="hidden md:flex items-center space-x-8">
-            <NavLink to="/" className={({ isActive }) =>
-              isActive ? 'text-emerald-600' : 'text-gray-600 hover:text-emerald-500'
-            }>
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                `hover:text-emerald-500 ${
+                  isActive ? 'text-emerald-600 font-semibold' : 'text-gray-600'
+                }`
+              }
+            >
               Home
             </NavLink>
-            <NavLink to="/analyze" className={({ isActive }) =>
-              isActive ? 'text-emerald-600' : 'text-gray-600 hover:text-emerald-500'
-            }>
+            <NavLink
+              to="/analyze"
+              className={({ isActive }) =>
+                `hover:text-emerald-500 ${
+                  isActive ? 'text-emerald-600 font-semibold' : 'text-gray-600'
+                }`
+              }
+            >
               Analyze
             </NavLink>
-            <NavLink to="/history" className={({ isActive }) =>
-              isActive ? 'text-emerald-600' : 'text-gray-600 hover:text-emerald-500'
-            }>
+            <NavLink
+              to="/history"
+              className={({ isActive }) =>
+                `hover:text-emerald-500 ${
+                  isActive ? 'text-emerald-600 font-semibold' : 'text-gray-600'
+                }`
+              }
+            >
               History
             </NavLink>
           </div>
@@ -54,32 +69,70 @@ export function Navbar() {
           </div>
         </div>
       </div>
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 bg-white z-50 flex flex-col p-6 animate-slide-in">
-          <button
-            className="self-end text-gray-600 hover:text-gray-900 mb-6"
-            onClick={toggleMobileMenu}
-          >
-            <X className="h-8 w-8" />
-          </button>
-          <div className="flex flex-col items-center space-y-4">
-            <NavLink to="/" onClick={toggleMobileMenu}>
+
+      {/* Mobile Sidebar */}
+      <div
+        className={`fixed inset-y-0 right-0 z-50 w-full max-w-xs bg-gray-100 transition-transform duration-300 ease-in-out ${
+          isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="flex flex-col h-screen py-6 overflow-hidden">
+          <div className="px-4 mb-8">
+            <button
+              className="self-end text-gray-600 hover:text-gray-900 mb-6"
+              onClick={toggleMobileMenu}
+            >
+              <X className="h-8 w-8" />
+            </button>
+          </div>
+
+          <nav className="flex flex-col justify-center px-4 pb-4 space-y-6">
+            <NavLink
+              to="/"
+              onClick={toggleMobileMenu}
+              className={({ isActive }) =>
+                `block text-lg ${
+                  isActive ? 'text-emerald-600 font-semibold' : 'text-gray-600'
+                } hover:text-emerald-500`
+              }
+            >
               Home
             </NavLink>
-            <NavLink to="/analyze" onClick={toggleMobileMenu}>
+            <NavLink
+              to="/analyze"
+              onClick={toggleMobileMenu}
+              className={({ isActive }) =>
+                `block text-lg ${
+                  isActive ? 'text-emerald-600 font-semibold' : 'text-gray-600'
+                } hover:text-emerald-500`
+              }
+            >
               Analyze
             </NavLink>
-            <NavLink to="/history" onClick={toggleMobileMenu}>
+            <NavLink
+              to="/history"
+              onClick={toggleMobileMenu}
+              className={({ isActive }) =>
+                `block text-lg ${
+                  isActive ? 'text-emerald-600 font-semibold' : 'text-gray-600'
+                } hover:text-emerald-500`
+              }
+            >
               History
             </NavLink>
-          </div>
-          <div className="mt-auto flex justify-center">
+          </nav>
+
+          {/* UserButton at the Center */}
+          <div className="mt-auto px-4 pt-4 bg-gray-100 rounded-md">
+            <SignedOut>
+              <SignInButton mode="modal" />
+            </SignedOut>
             <SignedIn>
               <UserButton />
             </SignedIn>
           </div>
         </div>
-      )}
+      </div>
     </nav>
   );
 }

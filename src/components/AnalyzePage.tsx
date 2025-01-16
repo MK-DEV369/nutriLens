@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Camera, Upload} from 'lucide-react';
 import CropModal from './CropModal';
 import { CameraModal } from './CameraModal';
@@ -18,6 +18,26 @@ export function AnalyzePage() {
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [calories, setCalories] = useState<number>(0);
   const { user } = useUser();
+  const [apiUrl, setApiUrl] = useState<string>('');
+
+  useEffect(() => {
+    const getApiUrl = () => {
+      if (process.env.NODE_ENV === 'development') {
+        if (isMobileDevice()) {
+          return 'http://192.168.1.3:5001';
+        } else {
+          return 'http://localhost:5001';
+        }
+      }
+      return '/api'; // For production, assuming your frontend and backend are hosted together
+    };
+
+    setApiUrl(getApiUrl());
+  }, []);
+
+  const isMobileDevice = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  };
 
   const progressBarWidth = useMemo(() => {
     if (analysisResult && analysisResult[0] !== undefined && !isNaN(parseFloat(analysisResult[0]))) {
@@ -52,8 +72,8 @@ export function AnalyzePage() {
   
     try {
       setLoading(true);
-      console.log("Sending request to http://localhost:5001/api/upload");
-      const response = await fetch('http://localhost:5001/api/upload', {
+      console.log(`Sending request to ${apiUrl}/api/upload`);
+      const response = await fetch(`${apiUrl}/api/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -96,7 +116,7 @@ export function AnalyzePage() {
       });
       console.log('Global Food Item List:', foodItemList);
 
-      await fetch("http://localhost:5001/save-history", {
+      await fetch(`${apiUrl}/save-history`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -106,6 +126,7 @@ export function AnalyzePage() {
           calories: energyValue,
         }),
       });
+
   
       console.log("History saved to backend.");
     } catch (error) {
@@ -291,11 +312,12 @@ export function AnalyzePage() {
                       </div>
                     </div>
                     <div className="bg-slate-50 rounded-lg">
-                      <div className="border border-slate-200 rounded-lg divide-y divide-slate-200">
-                        <h3 className="text-slate-700 text-lg font-semibold p-4">
-                          Nutritional Info
-                        </h3>
-                        <ul className="divide-y divide-slate-200">
+                    <div className="border border-slate-200 rounded-lg divide-y divide-slate-200">
+                      <h3 className="text-slate-700 text-lg font-semibold p-4 flex justify-between">
+                        Nutritional Info
+                        <span className="text-xl text-slate-700 font-semibold">RDA (in %)</span>
+                      </h3>
+                      <ul className="divide-y divide-slate-200">
                         {Object.entries(analysisResult[1]).map(([key, value]) => (
                           key !== 'FINAL_RATING' && key !== 'IGNORE' ? (
                             <li key={key} className="flex justify-between p-3 hover:bg-slate-100 transition-colors">
@@ -303,14 +325,13 @@ export function AnalyzePage() {
                                 {key.replace(/_/g, ' ')}
                               </span>
                               <span className="text-emerald-600 font-semibold">
-                              {Number(value).toFixed(2)}
-
+                                {Number(value).toFixed(2)}
                               </span>
                             </li>
                           ) : null
                         ))}
                       </ul>
-                      </div>
+                    </div>
                     </div>
                   </>
                 ) : (

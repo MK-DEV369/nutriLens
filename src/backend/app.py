@@ -71,7 +71,29 @@ def get_user_profile(userId):
         print(f"Error fetching user profile: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
-
+@app.route('/delete-entry', methods=['POST'])
+def delete_entry():
+    try:
+        data = request.json
+        user_id = data["userId"]
+        entry_id = data["entryId"]
+        date, name = entry_id.split(' ', 1)
+        
+        result = history_collection.delete_one({
+            "userId": user_id,
+            "date": date,
+            "name": name
+        })
+        
+        if result.deleted_count == 0:
+            return jsonify({"error": "Entry not found"}), 404
+        else:
+            return jsonify({"message": "Entry deleted successfully"}), 200
+    except Exception as e:
+        print(f"Error deleting entry: {str(e)}")
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+    
 def object_id_to_string(obj):
     if isinstance(obj, dict):
         return {k: object_id_to_string(v) for k, v in obj.items()}
