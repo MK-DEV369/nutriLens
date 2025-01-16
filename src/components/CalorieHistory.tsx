@@ -21,17 +21,26 @@ const CalorieHistory = () => {
 
   useEffect(() => {
     const getApiUrl = () => {
+      const currentHost = window.location.hostname;
+      console.log('Current host:', currentHost);
+
       if (process.env.NODE_ENV === 'development') {
-        if (isMobileDevice()) {
-          return 'http://nutri-lens-seven.vercel.app:5001';
-        } else {
-          return 'http://localhost:5001';
-        }
+        console.log('Development environment detected');
+        return isMobileDevice() ? 'http://192.168.1.3:5001' : 'http://localhost:5001';
       }
-      return '/api';
+
+      if (currentHost.includes('vercel.app')) {
+        console.log('Vercel environment detected');
+        return 'https://nutri-lens-seven.vercel.app/api'; // Use full URL for API routes
+      }
+
+      console.log('Fallback to localhost');
+      return 'http://localhost:5001';
     };
 
-    setApiUrl(getApiUrl());
+    const apiUrl = getApiUrl();
+    console.log('API URL:', apiUrl);
+    setApiUrl(apiUrl);
   }, []);
 
   const isMobileDevice = () => {

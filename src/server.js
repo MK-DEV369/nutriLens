@@ -112,10 +112,20 @@ app.get('/api/user-profiles', async (req, res) => {
   }
 });
 
+app.all('*', (req, res) => {
+  res.status(404).json({ error: 'Not found' });
+});
 
 app.get('/', (req, res) => {
   res.send('Welcome to the NutriLens API!');
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Export the app
+module.exports = app;
+
+// Start the server
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}

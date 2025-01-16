@@ -9,14 +9,22 @@ import Modal from './components/Modal';
 import { Chatbot } from './services/Chatbot';
 import CalorieHistory from './components/CalorieHistory';
 
-// Function to detect if the device is mobile
 const isMobileDevice = () => {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 };
 
 const getApiUrl = () => {
+  const currentHost = window.location.hostname;
+  console.log('Current host:', currentHost);
+
   if (process.env.NODE_ENV === 'development') {
-    return isMobileDevice() ? 'http://nutri-lens-seven.vercel.app:5000' : 'http://localhost:5000';
+    console.log('Development environment detected');
+    return isMobileDevice() ? 'http://192.168.1.3:5000' : 'http://localhost:5000';
+  }
+
+  if (currentHost.includes('vercel.app')) {
+    console.log('Vercel environment detected');
+    return 'https://nutri-lens-seven.vercel.app';
   }
   return '/api';
 };
@@ -54,7 +62,6 @@ function App() {
         height: Number(formData.height),
       };
   
-      // Use axios interceptors for error handling
       axios.interceptors.request.use(
         (config) => {
           console.log('Request sent:', config.url);
