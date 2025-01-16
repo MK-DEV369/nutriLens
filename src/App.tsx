@@ -18,6 +18,9 @@ const getApiUrl = () => {
   if (process.env.NODE_ENV === 'development') {
     return isMobileDevice() ? 'http://192.168.1.3:5000' : 'http://localhost:5000';
   }
+  if (window.location.hostname === 'nutri-lens-seven.vercel.app') {
+    return 'https://nutri-lens-seven.vercel.app/api'; // Replace with your production backend URL
+  }
   return '/api'; // For production, assuming your frontend and backend are hosted together
 };
 

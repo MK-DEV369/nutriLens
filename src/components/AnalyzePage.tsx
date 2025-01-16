@@ -22,16 +22,18 @@ export function AnalyzePage() {
 
   useEffect(() => {
     const getApiUrl = () => {
+      const currentHost = window.location.hostname;
+    
       if (process.env.NODE_ENV === 'development') {
-        if (isMobileDevice()) {
-          return 'http://192.168.1.3:5001';
-        } else {
-          return 'http://localhost:5001';
-        }
+        return isMobileDevice() ? 'http://192.168.1.3:5001' : 'http://localhost:5001';
       }
-      return '/api'; // For production, assuming your frontend and backend are hosted together
+    
+      if (currentHost.includes('vercel.app')) {
+        return 'https://nutri-lens-seven.vercel.app:5001/api'; // Use full URL for API routes
+      }
+    
+      return '/api';
     };
-
     setApiUrl(getApiUrl());
   }, []);
 
