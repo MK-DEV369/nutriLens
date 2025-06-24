@@ -11,6 +11,7 @@ interface CameraModalProps {
 export function CameraModal({ isOpen, onClose, onCapture }: CameraModalProps) {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoRef = React.createRef<HTMLVideoElement>();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -22,18 +23,36 @@ export function CameraModal({ isOpen, onClose, onCapture }: CameraModalProps) {
 
   const openCamera = async () => {
     try {
-      const constraints = {
-        video: { facingMode: 'environment' },
-        audio: false,
-      };
+      console.log('Attempting to open camera');
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        console.error('getUserMedia is not supported in this browser.');
+        throw new Error('getUserMedia is not supported by your browser.');
+      }
+      console.log('getUserMedia is supported');
+  
+      const constraints = { video: { facingMode: 'environment' }, audio: false };
+      console.log('Constraints:', JSON.stringify(constraints));
+  
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       setStream(stream);
-    } catch (error) {
-      console.error('Error accessing the camera:', error);
-      alert('Camera access is not available.');
+      setError(null);
+      console.log('Camera opened successfully');
+    } catch (err: any) {
+      console.error('Error accessing the camera:', err);
+      setError(err.message);
+  
+      if (err.name === 'NotAllowedError') {
+        alert('Camera access was denied. Please allow permissions in your browser settings.');
+      } else if (err.name === 'NotFoundError') {
+        alert('No camera found. Please ensure your device has a camera.');
+      } else if (err.name === 'NotReadableError') {
+        alert('The camera is already in use by another application.');
+      } else {
+        alert(`An unexpected error occurred: ${err.message}`);
+      }
     }
   };
-
+  
   const closeCamera = () => {
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
@@ -48,6 +67,7 @@ export function CameraModal({ isOpen, onClose, onCapture }: CameraModalProps) {
         const imageCapture = new (window as any).ImageCapture(videoTrack);
         imageCapture.takePhoto()
           .then((blob: Blob) => {
+            console.log('Photo captured successfully');
             onCapture(blob);
             closeCamera();
           })
