@@ -36,4 +36,5 @@ dist-ssr
 *__pycache__
 *src/backend/uploads
 *DATASET.csv
-*uploads\captured_img.jpg
+*.bolt
+bolt
